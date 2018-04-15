@@ -1,5 +1,6 @@
 library(jsonlite)
 library(plyr)
+library(zipcode)
 
 #' Retrieve table of grant information
 #' 
@@ -28,18 +29,19 @@ nsf_return <- function(keyword=NULL, zipcode=NULL, verbose=TRUE, print_fields=pr
     offset <- offset+25
     local.result <- data.frame(fromJSON(paste0(base_url, url_parameters, '&offset=', offset)))
     if(nrow(local.result)>0 & ncol(local.result)>1) {
+      Sys.sleep(3)
       result <- plyr::rbind.fill(result, local.result)
       if(verbose) {
         print(paste0("Finished next batch; now ", nrow(result), " records"))
       }
     }
   }
-  colnames(result) <- gsub('response.', '', colnames(result))
+  colnames(result) <- gsub('response.award.', '', colnames(result))
   return(result)
 }
 
 print_fields_get <- function() {
-  print_fields <- c("rpp", "offset", "id", "agency", "awardeeCity", "awardeeCountryCode", 
+  print_fields <- c("id", "agency", "awardeeCity", "awardeeCountryCode", 
                     "awardeeCounty", "awardeeDistrictCode", "awardeeName", "awardeeStateCode", 
                     "awardeeZipCode", "cfdaNumber", "coPDPI", "date", "startDate", 
                     "expDate", "estimatedTotalAmt", "fundsObligatedAmt", "dunsNumber", 
@@ -51,4 +53,16 @@ print_fields_get <- function() {
                     "awardAgencyCode", "projectOutComesReport", "abstractText", "piFirstName", 
                     "piMiddeInitial", "piLastName", "piPhone", "piEmail")
   return(print_fields)
+}
+
+nsf_get_all <- function() {
+  data(zipcode)
+  all_grants <- data.frame()
+  for (zipcode.index in sequence(nrow(zipcode))) {
+    Sys.sleep(3)
+   all_grants <- plyr::rbind.fill(all_grants, nsf_return(zipcode = zipcode$zip[zipcode.index])) 
+   print(paste0("Finished zipcode ", zipcode$zip[zipcode.index], " meaning ", round(100*zipcode.index/nrow(zipcode),2), '% done. ', nrow(all_grants), " rows done"))
+   save(all_grants, file="~/Downloads/NSFGrants.rda")
+  }
+  return(all_grants)
 }
