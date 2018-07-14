@@ -77,11 +77,34 @@ print_fields_get <- function() {
   return(print_fields)
 }
 
+#' Get all NSF grants for a person
+#'
+#' @description
+#' This will attempt to get all information for a person. Watch for multiple people with the same name
+#' @param first_name Just the first name
+#' @param middle_initial Only one letter, no periods
+#' @param last_name Only the last name
+#' @return A data frame with grant info
+#' @examples
+#' # Let's check with my grants (mainly to show how to deal with weird characters, like apostrophes)
+#' me <- nsf_get_person("Brian", "C", "O'Meara")
+#' nsf_wordcloud(me$abstractText)
+#' @export
+nsf_get_person <- function(first_name, middle_initial, last_name) {
+  if(nchar(middle_initial)>0) {
+    stop("middle initial should be a single character only (and no periods)")
+  }
+  last_only <- nsf_get_all(keyword=last_name)
+  PI <- last_only[grepl(paste(first_name, middle_initial, last_name),last_only$pdPIName, ignore.case=TRUE),]
+  CoPI <- last_only[grepl(paste(first_name, middle_initial, last_name),last_only$coPDPI, ignore.case=TRUE),]
+  person.grants <- rbind(PI, CoPI)
+  return(person.grants)
+}
 
 #' Retrieve all NSF grant information, saving to a file
 #'
 #' @param save_file File to save results to while running
-#' @return A data frame with returned info
+#' @return A data frame with grant info
 #' @export
 nsf_get_all <- function(save_file="NSFAllGrants.rda") {
   grants <- nsf_return(agency="NSF", save_file=save_file)

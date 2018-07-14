@@ -10,7 +10,7 @@ nsf_get_all(save_file = "NSFAllGrants.rda")
 \item{save_file}{File to save results to while running}
 }
 \value{
-A data frame with returned info
+A data frame with grant info
 }
 \description{
 Retrieve all NSF grant information, saving to a file
