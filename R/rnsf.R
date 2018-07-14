@@ -77,24 +77,30 @@ print_fields_get <- function() {
   return(print_fields)
 }
 
-#' Get all NSF grants for a person
+#' Attempt to get all NSF grants for a person's name
 #'
 #' @description
-#' This will attempt to get all information for a person. Watch for multiple people with the same name
+#' This will *attempt* to get all information for a person. There are many potential problems with this. Multiple people could have the same name. People could also modify their names (with change in marital status, change in gender, whether they use a middle initial, and so forth) so do not use this blindly to evaluate someone. That's what the h-index is for (I joke).
 #' @param first_name Just the first name
 #' @param middle_initial Only one letter, no periods
 #' @param last_name Only the last name
 #' @return A data frame with grant info
 #' @examples
 #' # Let's check with my grants (mainly to show how to deal with weird characters, like apostrophes)
-#' me <- nsf_get_person("Brian", "C", "O'Meara")
-#' nsf_wordcloud(me$abstractText)
+#' bco <- nsf_get_person("Brian", "C", "O'Meara")
+#' nsf_wordcloud(bco$abstractText)
+#' plot(x=range(c(lubridate::mdy(bco$startDate), lubridate::mdy(bco$expDate))), y=range(bco$fundsObligatedAmt), type="n", log="y", bty="n", xlab="Date", ylab="Funding amount in US dollars")
+#' for (grant.index in sequence(nrow(bco))) {
+#'   lines(x=c(lubridate::mdy(bco$startDate)[grant.index], lubridate::mdy(bco$expDate)[grant.index]), y=rep(bco$fundsObligatedAmt[grant.index],2))
+#'   text(x=mean(c(lubridate::mdy(bco$startDate)[grant.index], lubridate::mdy(bco$expDate)[grant.index])), y=as.numeric(bco$fundsObligatedAmt[grant.index]), labels=bco$title[grant.index], pos=3, cex=0.5)
+#' }
 #' @export
 nsf_get_person <- function(first_name, middle_initial, last_name) {
-  if(nchar(middle_initial)>0) {
+  if(nchar(middle_initial)>1) {
     stop("middle initial should be a single character only (and no periods)")
   }
-  last_only <- nsf_get_all(keyword=last_name)
+  last_only <- nsf_return(keyword=last_name)
+  print("Note that these are all records with this last name as a keyword")
   PI <- last_only[grepl(paste(first_name, middle_initial, last_name),last_only$pdPIName, ignore.case=TRUE),]
   CoPI <- last_only[grepl(paste(first_name, middle_initial, last_name),last_only$coPDPI, ignore.case=TRUE),]
   person.grants <- rbind(PI, CoPI)
@@ -140,16 +146,16 @@ nsf_wordcloud <- function(text=nsf_get_all()$abstractText, prune_words=c("will",
   # Convert the text to lower case
   text_corpus <- suppressWarnings(tm::tm_map(text_corpus, tm::content_transformer(tolower)))
   # Remove numbers
-  text_corpus <- suppressWarnings(tm::tm_map(text_corpus, removeNumbers))
+  text_corpus <- suppressWarnings(tm::tm_map(text_corpus, tm::removeNumbers))
   # Remove english common stopwords
-  text_corpus <- suppressWarnings(tm::tm_map(text_corpus, removeWords, tm::stopwords("english")))
+  text_corpus <- suppressWarnings(tm::tm_map(text_corpus, tm::removeWords, tm::stopwords("english")))
   if(length(prune_words)>0) {
-    text_corpus <- suppressWarnings(tm_map(text_corpus, removeWords, prune_words))
+    text_corpus <- suppressWarnings(tm_map(text_corpus, tm::removeWords, prune_words))
   }
   # Remove punctuations
-  text_corpus <- suppressWarnings(tm::tm_map(text_corpus, removePunctuation))
+  text_corpus <- suppressWarnings(tm::tm_map(text_corpus, tm::removePunctuation))
   # Eliminate extra white spaces
-  text_corpus <- suppressWarnings(tm::tm_map(text_corpus, stripWhitespace))
+  text_corpus <- suppressWarnings(tm::tm_map(text_corpus, tm::stripWhitespace))
   dtm <- TermDocumentMatrix(text_corpus)
   m <- as.matrix(dtm)
   v <- sort(rowSums(m),decreasing=TRUE)[1:min(max_words, length(v))]
