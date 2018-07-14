@@ -1,5 +1,5 @@
-library(jsonlite)
-library(plyr)
+#library(jsonlite)
+#library(plyr)
 
 #' Retrieve table of grant information
 #'
@@ -23,7 +23,7 @@ nsf_return <- function(keyword=NULL, zipcode=NULL, agency=NULL, verbose=TRUE, pr
   if (!is.null(agency)) {
     url_parameters <- paste0(url_parameters, "agency=",URLencode(agency), collapse='&')
   }
-  result <- data.frame(fromJSON(paste0(base_url, url_parameters)))
+  result <- data.frame(jsonlite::fromJSON(paste0(base_url, url_parameters)))
   if(verbose) {
     print("Finished first batch")
   }
@@ -34,7 +34,7 @@ nsf_return <- function(keyword=NULL, zipcode=NULL, agency=NULL, verbose=TRUE, pr
   }
   while(nrow(local.result)==25) {
     offset <- offset+25
-    local.result <- data.frame(fromJSON(paste0(base_url, url_parameters, '&offset=', offset)))
+    local.result <- data.frame(jsonlite::fromJSON(paste0(base_url, url_parameters, '&offset=', offset)))
     if(nrow(local.result)>0 & ncol(local.result)>1) {
       Sys.sleep(3)
       result <- plyr::rbind.fill(result, local.result)
