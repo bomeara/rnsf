@@ -84,3 +84,36 @@ nsf_get_all <- function(save_file="NSFAllGrants.rda") {
 #' A dataset of NSF awards from its start until the package was last updated
 #' @format A data frame with one row per award and columns with award information
 "grants"
+
+#' Abstract wordcloud
+#'
+#' Make a word cloud of all the words in the abstracts
+#' @param grants A data frame with grant information
+#' @description
+#' This follows the advice from http://www.sthda.com/english/wiki/text-mining-and-word-cloud-fundamentals-in-r-5-simple-steps-you-should-know on making a word cloud
+#' @export
+nsf_abstract_wordcloud <- function(grants=nsf_get_all(), ...) {
+  abstract_corpus <- tm::Corpus(tm::VectorSource(grants$abstractText))
+  toSpace <- tm::content_transformer(function (x , pattern ) gsub(pattern, " ", x))
+  abstract_corpus <- tm::tm_map(abstract_corpus, toSpace, "/")
+  abstract_corpus <- tm::tm_map(abstract_corpus, toSpace, "@")
+  abstract_corpus <- tm::tm_map(abstract_corpus, toSpace, "\\|")
+  # Convert the text to lower case
+  abstract_corpus <- tm::tm_map(abstract_corpus, content_transformer(tolower))
+  # Remove numbers
+  abstract_corpus <- tm::tm_map(abstract_corpus, removeNumbers)
+  # Remove english common stopwords
+  abstract_corpus <- tm::tm_map(abstract_corpus, removeWords, stopwords("english"))
+  # Remove your own stop word
+  # specify your stopwords as a character vector
+  abstract_corpus <- tm::tm_map(abstract_corpus, removeWords, c("blabla1", "blabla2"))
+  # Remove punctuations
+  abstract_corpus <- tm::tm_map(abstract_corpus, removePunctuation)
+  # Eliminate extra white spaces
+  abstract_corpus <- tm::tm_map(abstract_corpus, stripWhitespace)
+  dtm <- TermDocumentMatrix(abstract_corpus)
+  m <- as.matrix(dtm)
+  v <- sort(rowSums(m),decreasing=TRUE)
+  d <- data.frame(word = names(v),freq=v)
+  wordcloud(words = d$word, freq = d$freq, ...)
+}
