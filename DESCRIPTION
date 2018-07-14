@@ -11,5 +11,6 @@ RoxygenNote: 6.0.1
 Imports: jsonlite,
     plyr,
     wordcloud,
-    tm
+    tm,
+    lubridate
 Suggests: testthat

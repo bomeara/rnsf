@@ -4,12 +4,21 @@
 #' Retrieve table of grant information
 #'
 #' @param keyword Optional keyword to search on
-#' @param zipcode Optional zip code to limit search to (note that you should try both 5 and 9 digit)
+#' @param zipcode Optional zip code to limit search to (note that you should try both 5 and 9 digit). Note that there are often grants that lack zip code info
 #' @param agency Agency to search for (NSF or NASA)
 #' @param verbose If TRUE, outputs progress
 #' @param print_fields Names of elements to return (see NSF API documentation)
 #' @param save_file File to save results to while running
 #' @return A data frame with returned info
+#' @examples
+#' ants <- nsf_return(keyword="Formicidae")
+#' nsf_wordcloud(ants$abstractText)
+#'
+#' sanderson <- nsf_return(keyword="Sanderson")
+#' mjs.PI <- sanderson[grepl("Michael J Sanderson",sanderson$pdPIName),] #note the lack of period for middle initial in the search string
+#' mjs.CoPI <- sanderson[grepl("Michael J Sanderson",sanderson$coPDPI),]
+#' mjs.grants <- rbind(mjs.PI, mjs.CoPI)
+#' plot(x=lubridate::mdy(mjs.grants$startDate), y=mjs.grants$fundsObligatedAmt, pch=20, log="y", bty="n", xlab="Start date", ylab="Funding amount in US dollars")
 #' @export
 nsf_return <- function(keyword=NULL, zipcode=NULL, agency=NULL, verbose=TRUE, print_fields=print_fields_get(), save_file=NULL) {
   base_url <- paste0('https://api.nsf.gov/services/v1/awards.json?printFields=', paste0(print_fields, collapse=","), "&")
@@ -90,33 +99,37 @@ nsf_get_all <- function(save_file="NSFAllGrants.rda") {
 #' Make a word cloud of all the interesting words
 #' @param text A vector of text (for example, from grants$abstractText)
 #' @param prune_words Other words you want to prune before plotting
+#' @param max_words How many words at most to plot (it picks the most frequent ones)
 #' @param ... Arguments to the wordcloud function
 #' @description
 #' Create a wordcloud of text. This excludes common English words ("the", "and") but you can add your own to exclude as well. This uses the wordcloud package for plotting, and you can pass other arguments to that to make the plot prettier (see ?wordcloud::wordcloud)
 #' This follows the advice from http://www.sthda.com/english/wiki/text-mining-and-word-cloud-fundamentals-in-r-5-simple-steps-you-should-know on making a word cloud
+#' @examples
+#' data(grants)
+#' nsf_wordcloud(grants$abstractText[1:10])
 #' @export
-nsf_wordcloud <- function(text=nsf_get_all()$abstractText, prune_words=c("will"), ...) {
-  text_corpus <- tm::Corpus(tm::VectorSource(text))
-  toSpace <- tm::content_transformer(function (x , pattern ) gsub(pattern, " ", x))
-  text_corpus <- tm::tm_map(text_corpus, toSpace, "/")
-  text_corpus <- tm::tm_map(text_corpus, toSpace, "@")
-  text_corpus <- tm::tm_map(text_corpus, toSpace, "\\|")
+nsf_wordcloud <- function(text=nsf_get_all()$abstractText, prune_words=c("will", "nfs"), max_words=500, ...) {
+  text_corpus <- suppressWarnings(tm::Corpus(tm::VectorSource(text)))
+  toSpace <- suppressWarnings(tm::content_transformer(function (x , pattern ) gsub(pattern, " ", x)))
+  text_corpus <- suppressWarnings(tm::tm_map(text_corpus, toSpace, "/"))
+  text_corpus <- suppressWarnings(tm::tm_map(text_corpus, toSpace, "@"))
+  text_corpus <- suppressWarnings(tm::tm_map(text_corpus, toSpace, "\\|"))
   # Convert the text to lower case
-  text_corpus <- tm::tm_map(text_corpus, tm::content_transformer(tolower))
+  text_corpus <- suppressWarnings(tm::tm_map(text_corpus, tm::content_transformer(tolower)))
   # Remove numbers
-  text_corpus <- tm::tm_map(text_corpus, removeNumbers)
+  text_corpus <- suppressWarnings(tm::tm_map(text_corpus, removeNumbers))
   # Remove english common stopwords
-  text_corpus <- tm::tm_map(text_corpus, removeWords, tm::stopwords("english"))
+  text_corpus <- suppressWarnings(tm::tm_map(text_corpus, removeWords, tm::stopwords("english")))
   if(length(prune_words)>0) {
-    text_corpus <- tm_map(text_corpus, removeWords, prune_words)
+    text_corpus <- suppressWarnings(tm_map(text_corpus, removeWords, prune_words))
   }
   # Remove punctuations
-  text_corpus <- tm::tm_map(text_corpus, removePunctuation)
+  text_corpus <- suppressWarnings(tm::tm_map(text_corpus, removePunctuation))
   # Eliminate extra white spaces
-  text_corpus <- tm::tm_map(text_corpus, stripWhitespace)
+  text_corpus <- suppressWarnings(tm::tm_map(text_corpus, stripWhitespace))
   dtm <- TermDocumentMatrix(text_corpus)
   m <- as.matrix(dtm)
-  v <- sort(rowSums(m),decreasing=TRUE)
+  v <- sort(rowSums(m),decreasing=TRUE)[1:min(max_words, length(v))]
   d <- data.frame(word = names(v),freq=v)
-  wordcloud(words = d$word, freq = d$freq, ...)
+  wordcloud(words = d$word, freq = d$freq, random.order=FALSE, ...)
 }

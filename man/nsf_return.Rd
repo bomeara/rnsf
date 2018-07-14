@@ -10,7 +10,7 @@ nsf_return(keyword = NULL, zipcode = NULL, agency = NULL,
 \arguments{
 \item{keyword}{Optional keyword to search on}
 
-\item{zipcode}{Optional zip code to limit search to (note that you should try both 5 and 9 digit)}
+\item{zipcode}{Optional zip code to limit search to (note that you should try both 5 and 9 digit). Note that there are often grants that lack zip code info}
 
 \item{agency}{Agency to search for (NSF or NASA)}
 
@@ -25,4 +25,14 @@ A data frame with returned info
 }
 \description{
 Retrieve table of grant information
+}
+\examples{
+ants <- nsf_return(keyword="Formicidae")
+nsf_wordcloud(ants$abstractText)
+
+sanderson <- nsf_return(keyword="Sanderson")
+mjs.PI <- sanderson[grepl("Michael J Sanderson",sanderson$pdPIName),] #note the lack of period for middle initial in the search string
+mjs.CoPI <- sanderson[grepl("Michael J Sanderson",sanderson$coPDPI),]
+mjs.grants <- rbind(mjs.PI, mjs.CoPI)
+plot(x=lubridate::mdy(mjs.grants$startDate), y=mjs.grants$fundsObligatedAmt, pch=20, log="y", bty="n", xlab="Start date", ylab="Funding amount in US dollars")
 }

@@ -4,13 +4,15 @@
 \alias{nsf_wordcloud}
 \title{Text wordcloud}
 \usage{
-nsf_wordcloud(text = nsf_get_all()$abstractText, prune_words = c("will"),
-  ...)
+nsf_wordcloud(text = nsf_get_all()$abstractText, prune_words = c("will",
+  "nfs"), max_words = 500, ...)
 }
 \arguments{
 \item{text}{A vector of text (for example, from grants$abstractText)}
 
 \item{prune_words}{Other words you want to prune before plotting}
+
+\item{max_words}{How many words at most to plot (it picks the most frequent ones)}
 
 \item{...}{Arguments to the wordcloud function}
 }
@@ -20,4 +22,8 @@ This follows the advice from http://www.sthda.com/english/wiki/text-mining-and-w
 }
 \details{
 Make a word cloud of all the interesting words
+}
+\examples{
+data(grants)
+nsf_wordcloud(grants$abstractText[1:10])
 }
