@@ -68,6 +68,12 @@ print_fields_get <- function() {
   return(print_fields)
 }
 
+
+#' Retrieve all NSF grant information, saving to a file
+#'
+#' @param save_file File to save results to while running
+#' @return A data frame with returned info
+#' @export
 nsf_get_all <- function(save_file="NSFAllGrants.rda") {
   all_grants <- nsf_return(agency="NSF", save_file=save_file)
   return(all_grants)
