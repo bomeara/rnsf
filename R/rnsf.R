@@ -23,34 +23,34 @@ nsf_return <- function(keyword=NULL, zipcode=NULL, agency=NULL, verbose=TRUE, pr
   if (!is.null(agency)) {
     url_parameters <- paste0(url_parameters, "agency=",URLencode(agency), collapse='&')
   }
-  result <- data.frame(jsonlite::fromJSON(paste0(base_url, url_parameters)))
+  grants <- data.frame(jsonlite::fromJSON(paste0(base_url, url_parameters)))
   if(verbose) {
     print("Finished first batch")
   }
   offset <- 1
-  local.result <- result
+  local.grants <- grants
   if(!is.null(save_file)) {
-    save(result, file=save_file)
+    save(grants, file=save_file)
   }
-  while(nrow(local.result)==25) {
+  while(nrow(local.grants)==25) {
     offset <- offset+25
-    local.result <- data.frame(jsonlite::fromJSON(paste0(base_url, url_parameters, '&offset=', offset)))
-    if(nrow(local.result)>0 & ncol(local.result)>1) {
+    local.grants <- data.frame(jsonlite::fromJSON(paste0(base_url, url_parameters, '&offset=', offset)))
+    if(nrow(local.grants)>0 & ncol(local.grants)>1) {
       Sys.sleep(3)
-      result <- plyr::rbind.fill(result, local.result)
+      grants <- plyr::rbind.fill(grants, local.grants)
       if(verbose) {
-        print(paste0("Finished next batch; now ", nrow(result), " records"))
+        print(paste0("Finished next batch; now ", nrow(grants), " records"))
         if(!is.null(save_file)) {
-          save(result, file=save_file)
+          save(grants, file=save_file)
         }
       }
     }
   }
-  colnames(result) <- gsub('response.award.', '', colnames(result))
+  colnames(grants) <- gsub('response.award.', '', colnames(grants))
   if(!is.null(save_file)) {
-    save(result, file=save_file)
+    save(grants, file=save_file)
   }
-  return(result)
+  return(grants)
 }
 
 print_fields_get <- function() {
@@ -75,6 +75,6 @@ print_fields_get <- function() {
 #' @return A data frame with returned info
 #' @export
 nsf_get_all <- function(save_file="NSFAllGrants.rda") {
-  all_grants <- nsf_return(agency="NSF", save_file=save_file)
-  return(all_grants)
+  grants <- nsf_return(agency="NSF", save_file=save_file)
+  return(grants)
 }
