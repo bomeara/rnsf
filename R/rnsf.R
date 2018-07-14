@@ -78,3 +78,9 @@ nsf_get_all <- function(save_file="NSFAllGrants.rda") {
   grants <- nsf_return(agency="NSF", save_file=save_file)
   return(grants)
 }
+
+#' Grant information
+#'
+#' A dataset of NSF awards from its start until the package was last updated
+#' @format A data frame with one row per award and columns with award information
+"grants"
