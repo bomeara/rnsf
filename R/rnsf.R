@@ -85,33 +85,36 @@ nsf_get_all <- function(save_file="NSFAllGrants.rda") {
 #' @format A data frame with one row per award and columns with award information
 "grants"
 
-#' Abstract wordcloud
+#' Text wordcloud
 #'
-#' Make a word cloud of all the words in the abstracts
-#' @param grants A data frame with grant information
+#' Make a word cloud of all the interesting words
+#' @param text A vector of text (for example, from grants$abstractText)
+#' @param prune_words Other words you want to prune before plotting
+#' @param ... Arguments to the wordcloud function
 #' @description
+#' Create a wordcloud of text. This excludes common English words ("the", "and") but you can add your own to exclude as well. This uses the wordcloud package for plotting, and you can pass other arguments to that to make the plot prettier (see ?wordcloud::wordcloud)
 #' This follows the advice from http://www.sthda.com/english/wiki/text-mining-and-word-cloud-fundamentals-in-r-5-simple-steps-you-should-know on making a word cloud
 #' @export
-nsf_abstract_wordcloud <- function(grants=nsf_get_all(), ...) {
-  abstract_corpus <- tm::Corpus(tm::VectorSource(grants$abstractText))
+nsf_wordcloud <- function(text=nsf_get_all()$abstractText, prune_words=c("will"), ...) {
+  text_corpus <- tm::Corpus(tm::VectorSource(text))
   toSpace <- tm::content_transformer(function (x , pattern ) gsub(pattern, " ", x))
-  abstract_corpus <- tm::tm_map(abstract_corpus, toSpace, "/")
-  abstract_corpus <- tm::tm_map(abstract_corpus, toSpace, "@")
-  abstract_corpus <- tm::tm_map(abstract_corpus, toSpace, "\\|")
+  text_corpus <- tm::tm_map(text_corpus, toSpace, "/")
+  text_corpus <- tm::tm_map(text_corpus, toSpace, "@")
+  text_corpus <- tm::tm_map(text_corpus, toSpace, "\\|")
   # Convert the text to lower case
-  abstract_corpus <- tm::tm_map(abstract_corpus, content_transformer(tolower))
+  text_corpus <- tm::tm_map(text_corpus, tm::content_transformer(tolower))
   # Remove numbers
-  abstract_corpus <- tm::tm_map(abstract_corpus, removeNumbers)
+  text_corpus <- tm::tm_map(text_corpus, removeNumbers)
   # Remove english common stopwords
-  abstract_corpus <- tm::tm_map(abstract_corpus, removeWords, stopwords("english"))
-  # Remove your own stop word
-  # specify your stopwords as a character vector
-  abstract_corpus <- tm::tm_map(abstract_corpus, removeWords, c("blabla1", "blabla2"))
+  text_corpus <- tm::tm_map(text_corpus, removeWords, tm::stopwords("english"))
+  if(length(prune_words)>0) {
+    text_corpus <- tm_map(text_corpus, removeWords, prune_words)
+  }
   # Remove punctuations
-  abstract_corpus <- tm::tm_map(abstract_corpus, removePunctuation)
+  text_corpus <- tm::tm_map(text_corpus, removePunctuation)
   # Eliminate extra white spaces
-  abstract_corpus <- tm::tm_map(abstract_corpus, stripWhitespace)
-  dtm <- TermDocumentMatrix(abstract_corpus)
+  text_corpus <- tm::tm_map(text_corpus, stripWhitespace)
+  dtm <- TermDocumentMatrix(text_corpus)
   m <- as.matrix(dtm)
   v <- sort(rowSums(m),decreasing=TRUE)
   d <- data.frame(word = names(v),freq=v)
