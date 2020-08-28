@@ -4,8 +4,14 @@
 \alias{nsf_return}
 \title{Retrieve table of grant information}
 \usage{
-nsf_return(keyword = NULL, zipcode = NULL, agency = NULL,
-  verbose = TRUE, print_fields = print_fields_get(), save_file = NULL)
+nsf_return(
+  keyword = NULL,
+  zipcode = NULL,
+  agency = NULL,
+  verbose = TRUE,
+  print_fields = print_fields_get(),
+  save_file = NULL
+)
 }
 \arguments{
 \item{keyword}{Optional keyword to search on}

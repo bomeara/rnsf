@@ -4,8 +4,12 @@
 \alias{nsf_wordcloud}
 \title{Text wordcloud}
 \usage{
-nsf_wordcloud(text = nsf_get_all()$abstractText, prune_words = c("will",
-  "nfs"), max_words = 500, ...)
+nsf_wordcloud(
+  text = nsf_get_all()$abstractText,
+  prune_words = c("will", "nfs"),
+  max_words = 500,
+  ...
+)
 }
 \arguments{
 \item{text}{A vector of text (for example, from grants$abstractText)}

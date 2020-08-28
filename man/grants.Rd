@@ -4,7 +4,9 @@
 \name{grants}
 \alias{grants}
 \title{Grant information}
-\format{A data frame with one row per award and columns with award information}
+\format{
+A data frame with one row per award and columns with award information
+}
 \usage{
 grants
 }

@@ -4,12 +4,12 @@
 \alias{nsf_get_person}
 \title{Attempt to get all NSF grants for a person's name}
 \usage{
-nsf_get_person(first_name, middle_initial, last_name)
+nsf_get_person(first_name = ".*", middle_initial = ".*", last_name)
 }
 \arguments{
-\item{first_name}{Just the first name}
+\item{first_name}{Just the first name. For wildcards, use ".*"}
 
-\item{middle_initial}{Only one letter, no periods}
+\item{middle_initial}{Only one letter, no periods. For wildcards, use ".*"}
 
 \item{last_name}{Only the last name}
 }

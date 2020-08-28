@@ -81,8 +81,8 @@ print_fields_get <- function() {
 #'
 #' @description
 #' This will *attempt* to get all information for a person. There are many potential problems with this. Multiple people could have the same name. People could also modify their names (with change in marital status, change in gender, whether they use a middle initial, and so forth) so do not use this blindly to evaluate someone. That's what the h-index is for (I joke).
-#' @param first_name Just the first name
-#' @param middle_initial Only one letter, no periods
+#' @param first_name Just the first name. For wildcards, use ".*"
+#' @param middle_initial Only one letter, no periods. For wildcards, use ".*"
 #' @param last_name Only the last name
 #' @return A data frame with grant info
 #' @examples
@@ -95,7 +95,7 @@ print_fields_get <- function() {
 #'   text(x=mean(c(lubridate::mdy(bco$startDate)[grant.index], lubridate::mdy(bco$expDate)[grant.index])), y=as.numeric(bco$fundsObligatedAmt[grant.index]), labels=bco$title[grant.index], pos=3, cex=0.5)
 #' }
 #' @export
-nsf_get_person <- function(first_name, middle_initial, last_name) {
+nsf_get_person <- function(first_name=".*", middle_initial=".*", last_name) {
   if(nchar(middle_initial)>1) {
     stop("middle initial should be a single character only (and no periods)")
   }
