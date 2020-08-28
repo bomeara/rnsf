@@ -96,7 +96,7 @@ print_fields_get <- function() {
 #' }
 #' @export
 nsf_get_person <- function(first_name=".*", middle_initial=".*", last_name) {
-  if(nchar(middle_initial)>1) {
+  if(nchar(middle_initial)>1 & middle_initial!=".*") {
     stop("middle initial should be a single character only (and no periods)")
   }
   last_only <- nsf_return(keyword=last_name)
