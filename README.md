@@ -4,6 +4,9 @@ Unofficial package to interface with NSF API
 
 It also has abstracts, dates, and more information for all grants up to March 28, 2026. 
 
+* Webpage with package information: <https://bomeara.github.io/rnsf/>
+* Github page: <https://github.com/bomeara/rnsf/>
+
 To install the package:
 
 ```
@@ -33,3 +36,4 @@ And there is a function for doing a wordcloud:
 ```
 nsf_wordcloud(ants$abstractText)
 ```
+
