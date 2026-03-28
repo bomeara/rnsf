@@ -55,7 +55,24 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-Uses the United States' National Science Foundation (NSF) API (https://www.research.gov/common/webapi/awardapisearch-v1.htm) to download info on awards (grants for funding science). Also includes functions for visualizing and analyzing the data.
+<div class="section level1">
+<div class="page-header"><h1 id="rnsf">rnsf<a class="anchor" aria-label="anchor" href="#rnsf"></a>
+</h1></div>
+<p>Unofficial package to interface with NSF API</p>
+<p>It also has abstracts, dates, and more information for all grants up to March 28, 2026.</p>
+<p>To install the package:</p>
+<pre><code><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"bomeara/rnsf"</span><span class="op">)</span></span></code></pre>
+<p>To get all grant data:</p>
+<pre><code><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">rnsf</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">grants</span><span class="op">)</span></span></code></pre>
+<p>This will give you a data.frame with all data: <code>head(grants)</code></p>
+<p>It has multiple date fields which are in “%m/%d/%Y” format (but everything is stored as a raw list, leaving to the user to process it).</p>
+<p>You can also do a new search. For example, to get all info on ants:</p>
+<pre><code><span><span class="va">ants</span> <span class="op">&lt;-</span> <span class="fu">rnsf</span><span class="fu">::</span><span class="fu"><a href="reference/nsf_return.html">nsf_return</a></span><span class="op">(</span>keyword<span class="op">=</span><span class="st">"Formicidae"</span><span class="op">)</span></span></code></pre>
+<p>And there is a function for doing a wordcloud:</p>
+<pre><code><span><span class="fu"><a href="reference/nsf_wordcloud.html">nsf_wordcloud</a></span><span class="op">(</span><span class="va">ants</span><span class="op">$</span><span class="va">abstractText</span><span class="op">)</span></span></code></pre>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
