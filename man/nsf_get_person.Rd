@@ -17,7 +17,7 @@ nsf_get_person(first_name = ".*", middle_initial = ".*", last_name)
 A data frame with grant info
 }
 \description{
-This will *attempt* to get all information for a person. There are many potential problems with this. Multiple people could have the same name. People could also modify their names (with change in marital status, change in gender, whether they use a middle initial, and so forth) so do not use this blindly to evaluate someone. That's what the h-index is for (I joke).
+This will *attempt* to get all information for a person. There are many potential problems with this. Multiple people could have the same name. People could also modify their names (with change in marital status, change in gender, whether they use a middle initial, and so forth) so do not use this naively to evaluate someone. That's what the h-index is for (I joke).
 }
 \examples{
 # Let's check with my grants (mainly to show how to deal with weird characters, like apostrophes)

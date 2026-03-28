@@ -80,7 +80,7 @@ print_fields_get <- function() {
 #' Attempt to get all NSF grants for a person's name
 #'
 #' @description
-#' This will *attempt* to get all information for a person. There are many potential problems with this. Multiple people could have the same name. People could also modify their names (with change in marital status, change in gender, whether they use a middle initial, and so forth) so do not use this blindly to evaluate someone. That's what the h-index is for (I joke).
+#' This will *attempt* to get all information for a person. There are many potential problems with this. Multiple people could have the same name. People could also modify their names (with change in marital status, change in gender, whether they use a middle initial, and so forth) so do not use this naively to evaluate someone. That's what the h-index is for (I joke).
 #' @param first_name Just the first name. For wildcards, use ".*"
 #' @param middle_initial Only one letter, no periods. For wildcards, use ".*"
 #' @param last_name Only the last name
@@ -108,7 +108,7 @@ nsf_get_person <- function(first_name=".*", middle_initial=".*", last_name) {
 }
 
 #' Retrieve all NSF grant information, saving to a file
-#'
+#' 
 #' @param save_file File to save results to while running
 #' @return A data frame with grant info
 #' @export
@@ -119,7 +119,7 @@ nsf_get_all <- function(save_file="NSFAllGrants.rda") {
 
 #' Grant information
 #'
-#' A dataset of NSF awards from its start until the package was last updated
+#' A dataset of NSF awards from its start until the package was last updated (March 28, 2026)
 #' @format A data frame with one row per award and columns with award information
 "grants"
 
@@ -156,9 +156,9 @@ nsf_wordcloud <- function(text=nsf_get_all()$abstractText, prune_words=c("will",
   text_corpus <- suppressWarnings(tm::tm_map(text_corpus, tm::removePunctuation))
   # Eliminate extra white spaces
   text_corpus <- suppressWarnings(tm::tm_map(text_corpus, tm::stripWhitespace))
-  dtm <- TermDocumentMatrix(text_corpus)
+  dtm <- tm::TermDocumentMatrix(text_corpus)
   m <- as.matrix(dtm)
-  v <- sort(rowSums(m),decreasing=TRUE)[1:min(max_words, length(v))]
+  v <- sort(rowSums(m),decreasing=TRUE)[1:min(max_words, nrow(m))]
   d <- data.frame(word = names(v),freq=v)
-  wordcloud(words = d$word, freq = d$freq, random.order=FALSE, ...)
+  wordcloud::wordcloud(words = d$word, freq = d$freq, random.order = FALSE, ...)
 }

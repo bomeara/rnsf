@@ -11,6 +11,6 @@ A data frame with one row per award and columns with award information
 grants
 }
 \description{
-A dataset of NSF awards from its start until the package was last updated
+A dataset of NSF awards from its start until the package was last updated (March 28, 2026)
 }
 \keyword{datasets}
