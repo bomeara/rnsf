@@ -150,7 +150,7 @@ nsf_wordcloud <- function(text=nsf_get_all()$abstractText, prune_words=c("will",
   # Remove english common stopwords
   text_corpus <- suppressWarnings(tm::tm_map(text_corpus, tm::removeWords, tm::stopwords("english")))
   if(length(prune_words)>0) {
-    text_corpus <- suppressWarnings(tm_map(text_corpus, tm::removeWords, prune_words))
+    text_corpus <- suppressWarnings(tm::tm_map(text_corpus, tm::removeWords, prune_words))
   }
   # Remove punctuations
   text_corpus <- suppressWarnings(tm::tm_map(text_corpus, tm::removePunctuation))
