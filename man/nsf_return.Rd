@@ -7,7 +7,8 @@
 nsf_return(
   keyword = NULL,
   zipcode = NULL,
-  agency = NULL,
+  agency = "NSF",
+  statecode = NULL,
   verbose = TRUE,
   print_fields = print_fields_get(),
   save_file = NULL
@@ -19,6 +20,8 @@ nsf_return(
 \item{zipcode}{Optional zip code to limit search to (note that you should try both 5 and 9 digit). Note that there are often grants that lack zip code info}
 
 \item{agency}{Agency to search for (NSF or NASA)}
+
+\item{statecode}{Two letter state code for the awardee location}
 
 \item{verbose}{If TRUE, outputs progress}
 

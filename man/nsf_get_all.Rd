@@ -13,5 +13,5 @@ nsf_get_all(save_file = "NSFAllGrants.rda")
 A data frame with grant info
 }
 \description{
-Retrieve all NSF grant information, saving to a file
+Since the returns are limited to 3,000 entries total, we will search by state, then aggregate
 }

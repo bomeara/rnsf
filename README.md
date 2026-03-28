@@ -37,3 +37,21 @@ And there is a function for doing a wordcloud:
 nsf_wordcloud(ants$abstractText)
 ```
 
+We can plot funding over time, inspired by Jeremy Berg's graphs on federal funding (see <https://jeremymberg.github.io/jeremyberg.github.io/>)
+
+```
+library(rnsf)
+library(ggplot2)
+library(timeDate)
+library(dplyr)
+
+data(grants) # or use grants <- rnsf::nsf_get_all() to get the most current list
+grants$date <- as.Date(grants$date, format="%m/%d/%Y")
+grants$year <- format(grants$date, "%Y")
+grants$dayofyear <- timeDate::dayOfYear(timeDate::timeDate(grants$date))
+grants$estimatedTotalAmt <- as.numeric(grants$estimatedTotalAmt)
+grants <- grants |> arrange(year, dayofyear) |> group_by(year) |> mutate(estimatedTotalAmt_by_year = cumsum(estimatedTotalAmt)) |> ungroup()
+grants <- grants[!is.na(grants$year),]
+g <- ggplot(grants, aes(x=dayofyear, y=estimatedTotalAmt_by_year/1e9, colour=year)) + geom_line() + theme_minimal() + xlab("Day of year") + ylab("Cumulative billions of dollars awarded")
+print(g)
+```

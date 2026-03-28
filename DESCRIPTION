@@ -12,5 +12,6 @@ Imports: jsonlite,
     plyr,
     wordcloud,
     tm,
-    lubridate
+    lubridate,
+	USAboundaries
 Suggests: testthat
