@@ -98,8 +98,8 @@ nsf_return <- function(
 				#Sys.sleep(3)
 				grants <- plyr::rbind.fill(grants, local.grants)
 				if (verbose) {
-					print(paste0(
-						"Finished next batch of ",
+					cat(paste0(
+						"\rFinished next batch of ",
 						nrow(local.grants),
 						" records; now ",
 						nrow(grants),
@@ -178,11 +178,28 @@ nsf_get_all <- function(save_file="NSFAllGrants.rda") {
   grants <- data.frame()
   data(state_codes, package="USAboundaries")
   for(state_index in sequence(nrow(state_codes))) {
-	print(paste0("Now getting data for ", state_codes$state_name[state_index]))
-  	grants <- plyr::rbind.fill(
-				grants,
-				nsf_return(agency = "NSF", statecode = state_codes$state_abbr[state_index], save_file = save_file)
+	try({
+		if(nchar(state_codes$state_abbr[state_index])==2) {
+			print(paste0("Now getting data for ", state_codes$state_name[state_index]))
+			start_time <- Sys.time()
+			new_grants <- nsf_return(
+				agency = "NSF",
+				statecode = state_codes$state_abbr[state_index],
+				save_file = NULL,
+				verbose = TRUE
 			)
+			if (nrow(new_grants) > 0) {
+				grants <- plyr::rbind.fill(
+					grants,
+					new_grants
+				)
+			}
+			end_time <- Sys.time()
+			print(paste0("Found ", nrow(new_grants), " grants, making for ", nrow(grants), " grants in total"))
+			print(end_time - start_time)
+			save(grants, file = save_file)
+		}
+	})
   }
   return(grants)
 }
