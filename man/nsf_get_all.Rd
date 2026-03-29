@@ -4,14 +4,16 @@
 \alias{nsf_get_all}
 \title{Retrieve all NSF grant information, saving to a file}
 \usage{
-nsf_get_all(save_file = "NSFAllGrants.rda")
+nsf_get_all(save_file = "NSFAllGrants.rda", startdate = NULL)
 }
 \arguments{
 \item{save_file}{File to save results to while running}
+
+\item{startdate}{Start date for award date to search. Accepted date format is mm/dd/yyyy (ex.12/31/2012)}
 }
 \value{
 A data frame with grant info
 }
 \description{
-Since the returns are limited to 3,000 entries total, we will search by state, then aggregate
+Since the returns are limited to 3,000 entries total, we will search by state, then aggregate. Progress as you go will be saved to save_file. You can also specify a startdate; this is mostly used internally for updating the cache.
 }

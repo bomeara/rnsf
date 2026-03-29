@@ -3,4 +3,5 @@
 export(nsf_get_all)
 export(nsf_get_person)
 export(nsf_return)
+export(nsf_update_cached)
 export(nsf_wordcloud)

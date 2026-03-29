@@ -9,6 +9,8 @@ nsf_return(
   zipcode = NULL,
   agency = "NSF",
   statecode = NULL,
+  startdate = NULL,
+  enddate = NULL,
   verbose = TRUE,
   print_fields = print_fields_get(),
   save_file = NULL
@@ -23,6 +25,10 @@ nsf_return(
 
 \item{statecode}{Two letter state code for the awardee location}
 
+\item{startdate}{Start date for award date to search. Accepted date format is mm/dd/yyyy (ex.12/31/2012)}
+
+\item{enddate}{End date for award date to search. Accepted date format is mm/dd/yyyy (ex.12/31/2012)}
+
 \item{verbose}{If TRUE, outputs progress}
 
 \item{print_fields}{Names of elements to return (see NSF API documentation)}
@@ -33,7 +39,7 @@ nsf_return(
 A data frame with returned info
 }
 \description{
-Retrieve table of grant information
+Note that it can only return a maximum of 9976 grants per call.
 }
 \examples{
 ants <- nsf_return(keyword="Formicidae")

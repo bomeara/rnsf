@@ -2,11 +2,15 @@
 #library(plyr)
 
 #' Retrieve table of grant information
+#' 
+#' Note that it can only return a maximum of 9976 grants per call.
 #'
 #' @param keyword Optional keyword to search on
 #' @param zipcode Optional zip code to limit search to (note that you should try both 5 and 9 digit). Note that there are often grants that lack zip code info
 #' @param agency Agency to search for (NSF or NASA)
 #' @param statecode Two letter state code for the awardee location
+#' @param startdate Start date for award date to search. Accepted date format is mm/dd/yyyy (ex.12/31/2012)
+#' @param enddate End date for award date to search. Accepted date format is mm/dd/yyyy (ex.12/31/2012)
 #' @param verbose If TRUE, outputs progress
 #' @param print_fields Names of elements to return (see NSF API documentation)
 #' @param save_file File to save results to while running
@@ -26,6 +30,8 @@ nsf_return <- function(
 	zipcode = NULL,
 	agency = "NSF",
 	statecode = NULL,
+	startdate = NULL,
+	enddate = NULL,
 	verbose = TRUE,
 	print_fields = print_fields_get(),
 	save_file = NULL
@@ -65,7 +71,28 @@ nsf_return <- function(
 			collapse = '&'
 		)
 	}
-	grants <- data.frame(jsonlite::fromJSON(paste0(base_url, url_parameters)))
+	if (!is.null(startdate)) {
+		url_parameters <- paste0(
+			c(
+				url_parameters,
+				paste0("dateStart=", URLencode(startdate))
+			),
+			collapse = '&'
+		)		
+	}
+	if (!is.null(enddate)) {
+		url_parameters <- paste0(
+			c(
+				url_parameters,
+				paste0("dateEnd=", URLencode(enddate))
+			),
+			collapse = '&'
+		)
+	}
+	grants <- data.frame()
+	try({
+		grants <- data.frame(jsonlite::fromJSON(paste0(base_url, url_parameters)))
+	}, silent=TRUE) # so it is quiet if this fails
 	if (verbose) {
 		print("Finished first batch")
 	}
@@ -74,7 +101,9 @@ nsf_return <- function(
 	if (!is.null(save_file)) {
 		save(grants, file = save_file)
 	}
-	while (nrow(local.grants) == 25) {
+	keep_running = TRUE
+	while (nrow(local.grants) == 25 & keep_running) {
+		keep_running <- FALSE
 		try({
 			offset <- offset + 25
 			local.grants <- data.frame(jsonlite::fromJSON(paste0(
@@ -84,6 +113,7 @@ nsf_return <- function(
 				offset
 			)))
 			if (nrow(local.grants) > 0 & ncol(local.grants) > 1) {
+				keep_running <- TRUE
 				years <- c(
 					years,
 					as.numeric(format(
@@ -113,11 +143,14 @@ nsf_return <- function(
 					}
 				}
 			}
-		})
+		}, silent=TRUE)
 	}
 	colnames(grants) <- gsub('response.award.', '', colnames(grants))
 	if (!is.null(save_file)) {
 		save(grants, file = save_file)
+	}
+	if(nrow(grants) == 9976) {
+		warning("This call to rnsf::nsf_return recovered the maximum number of grants (9976) it could recover from NSF's API -- this may mean that older grants are not included")	
 	}
 	return(grants)
 }
@@ -169,12 +202,13 @@ nsf_get_person <- function(first_name=".*", middle_initial=".*", last_name) {
 
 #' Retrieve all NSF grant information, saving to a file
 #' 
-#' Since the returns are limited to 3,000 entries total, we will search by state, then aggregate
+#' Since the returns are limited to 3,000 entries total, we will search by state, then aggregate. Progress as you go will be saved to save_file. You can also specify a startdate; this is mostly used internally for updating the cache.
 #' 
 #' @param save_file File to save results to while running
+#' @param startdate Start date for award date to search. Accepted date format is mm/dd/yyyy (ex.12/31/2012)
 #' @return A data frame with grant info
 #' @export
-nsf_get_all <- function(save_file="NSFAllGrants.rda") {
+nsf_get_all <- function(save_file="NSFAllGrants.rda", startdate=NULL) {
   grants <- data.frame()
   data(state_codes, package="USAboundaries")
   for(state_index in sequence(nrow(state_codes))) {
@@ -182,12 +216,46 @@ nsf_get_all <- function(save_file="NSFAllGrants.rda") {
 		if(nchar(state_codes$state_abbr[state_index])==2) {
 			print(paste0("Now getting data for ", state_codes$state_name[state_index]))
 			start_time <- Sys.time()
-			new_grants <- nsf_return(
-				agency = "NSF",
-				statecode = state_codes$state_abbr[state_index],
-				save_file = NULL,
-				verbose = TRUE
-			)
+			if (!is.null(startdate)) {
+				# we're just updating
+				new_grants <- nsf_return(
+					agency = "NSF",
+					statecode = state_codes$state_abbr[state_index],
+					startdate = startdate,
+					save_file = NULL,
+					verbose = TRUE
+				)
+			} else {
+				# we're doing a full pull, but some states (CA, AZ) have too many grants to pull at once (CA has over 9976 for just 2017-2026), so we have to split it up
+				new_grants <- data.frame()
+				print(" ")
+				for (year in rev(1960:as.numeric(format(Sys.Date(), "%Y")))) {
+					try({
+						year_grants <- nsf_return(
+							agency = "NSF",
+							statecode = state_codes$state_abbr[state_index],
+							startdate = paste0("01/01/", year),
+							enddate = paste0("12/31/", year),
+							save_file = NULL,
+							verbose = TRUE
+						)
+						if (nrow(year_grants) > 0) {
+							new_grants <- plyr::rbind.fill(
+								new_grants,
+								year_grants
+							)
+						}
+						cat(
+							"\rYear: ",
+							year,
+							" number of grants: ",
+							nrow(year_grants),
+							" total: ",
+							nrow(new_grants)
+						)
+					})
+				}
+			}
 			if (nrow(new_grants) > 0) {
 				grants <- plyr::rbind.fill(
 					grants,
@@ -195,13 +263,37 @@ nsf_get_all <- function(save_file="NSFAllGrants.rda") {
 				)
 			}
 			end_time <- Sys.time()
-			print(paste0("Found ", nrow(new_grants), " grants, making for ", nrow(grants), " grants in total"))
+			print(paste0("\nFound ", nrow(new_grants), " grants, making for ", nrow(grants), " grants in total"))
 			print(end_time - start_time)
 			save(grants, file = save_file)
 		}
-	})
+	}, silent=TRUE)
   }
   return(grants)
+}
+
+#' Update cached information
+#'
+#' Adds grants after the last cached ones. Once it is updated
+#'
+#' @examples
+#' grants <- nsf_update_cached()
+#' devtools::use_data(grants, overwrite=TRUE) # if you are updating the package as well
+#'
+#' @return A data.frame with the original grants data and appended new data
+#' @export
+nsf_update_cached <- function() {
+	data(grants)
+	dates <- as.Date(grants$date, format = "%m/%d/%Y")
+	most_recent <- max(dates, na.rm=TRUE)
+	next_day <- most_recent+1
+	grants_new <- nsf_get_all(savefile=NULL, startdate=format(next_day, format="%m/%d/%y"))
+	if (nrow(grants_new) > 0) {
+		grants <- grants <- plyr::rbind.fill(grants, grants_new)
+	}
+	print(paste0("\n\nIn total, ", nrow(grants_new), " were added, there are now ", nrow(grants), " grants total"))
+	print("Remember, if you are using this to update the data in the package, assuming the results are output into an object called grants, use devtools::use_data(grants, overwrite=TRUE) to update the package")
+	return(grants)
 }
 
 #' Grant information
