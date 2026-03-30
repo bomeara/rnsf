@@ -1,6 +1,7 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>/404.html</loc></url>
 <url><loc>/LICENSE-text.html</loc></url>
+<url><loc>/README copy.html</loc></url>
 <url><loc>/authors.html</loc></url>
 <url><loc>/index.html</loc></url>
 <url><loc>/reference/grants.html</loc></url>
@@ -8,6 +9,7 @@
 <url><loc>/reference/nsf_get_all.html</loc></url>
 <url><loc>/reference/nsf_get_person.html</loc></url>
 <url><loc>/reference/nsf_return.html</loc></url>
+<url><loc>/reference/nsf_update_cached.html</loc></url>
 <url><loc>/reference/nsf_wordcloud.html</loc></url>
 </urlset>
 

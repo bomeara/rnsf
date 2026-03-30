@@ -343,3 +343,10 @@ nsf_wordcloud <- function(text=nsf_get_all()$abstractText, prune_words=c("will",
   d <- data.frame(word = names(v),freq=v)
   wordcloud::wordcloud(words = d$word, freq = d$freq, random.order = FALSE, ...)
 }
+
+# compile_grfp_information <- function() {
+# 	raw_grfp_files <- system.files("extdata", package="rnsf", full.names=TRUE)
+# 	for (file_name in raw_grfp_files) {
+		
+# 	}
+# }

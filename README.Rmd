@@ -51,14 +51,20 @@ library(rnsf)
 ants <- rnsf::nsf_return(keyword="Formicidae")
 ```
 
-And there is a function for doing a wordcloud:
+# Visualization
+
+## Wordcloud
+
+There is a function for doing a wordcloud:
 
 ```{r wordcloud, warning=FALSE}
 library(rnsf)
 nsf_wordcloud(ants$abstractText)
 ```
 
-We can plot funding over time, inspired by Jeremy Berg's graphs on federal funding (see <https://jeremymberg.github.io/jeremyberg.github.io/>)
+## Bergogram
+
+We can plot funding over time, inspired by (but not endorsed by) Jeremy Berg's graphs on federal funding (see <https://jeremymberg.github.io/jeremyberg.github.io/>)
 
 ```{r bergogram, warning=FALSE}
 library(rnsf)
@@ -79,11 +85,13 @@ g <- ggplot(grants_recent, aes(x=dayofyear, y=estimatedTotalAmt_by_year/1e9, col
 print(g)
 ```
 
-We can also look at a table with the number, not total money, of grants by state by year, for example (showing just the first few states):
+## Table of award info
+
+We can also look at a table with the number, not total money, of grants by state by year, for example (showing just the first few states, and only including this year up to the last cache of the data).
 
 ```{r grantsbyyear}
 library(tidyr)
 library(knitr)
 grants_aggregated <- grants |> filter(year > 2023) |> group_by(year, awardeeStateCode) |> summarise(total_awarded = n(), .groups = "drop_last") |> ungroup() |> tidyr::pivot_wider(names_from = year, values_from=total_awarded, values_fill=0) |> dplyr::arrange(desc(`2024`))
-knitr::kable(head(grants_aggregated,10))
+knitr::kable(head(grants_aggregated,15))
 ```
