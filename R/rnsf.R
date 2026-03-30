@@ -204,6 +204,8 @@ nsf_get_person <- function(first_name=".*", middle_initial=".*", last_name) {
 #' 
 #' Since the returns are limited to 3,000 entries total, we will search by state, then aggregate. Progress as you go will be saved to save_file. You can also specify a startdate; this is mostly used internally for updating the cache.
 #' 
+#' There are over 500,000 NSF grants. This will take hours to run and result in a file almost a gigabyte in size.
+#' 
 #' @param save_file File to save results to while running
 #' @param startdate Start date for award date to search. Accepted date format is mm/dd/yyyy (ex.12/31/2012)
 #' @return A data frame with grant info
@@ -278,7 +280,7 @@ nsf_get_all <- function(save_file="NSFAllGrants.rda", startdate=NULL) {
 #'
 #' @examples
 #' grants <- nsf_update_cached()
-#' devtools::use_data(grants, overwrite=TRUE) # if you are updating the package as well
+#' usethis::use_data(grants, overwrite=TRUE) # if you are updating the package as well
 #'
 #' @return A data.frame with the original grants data and appended new data
 #' @export
@@ -292,7 +294,7 @@ nsf_update_cached <- function() {
 		grants <- grants <- plyr::rbind.fill(grants, grants_new)
 	}
 	print(paste0("\n\nIn total, ", nrow(grants_new), " were added, there are now ", nrow(grants), " grants total"))
-	print("Remember, if you are using this to update the data in the package, assuming the results are output into an object called grants, use devtools::use_data(grants, overwrite=TRUE) to update the package")
+	print("Remember, if you are using this to update the data in the package, assuming the results are output into an object called grants, use usethis::use_data(grants, overwrite=TRUE) to update the package")
 	return(grants)
 }
 
