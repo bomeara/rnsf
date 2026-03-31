@@ -17,3 +17,6 @@ A data frame with grant info
 \description{
 Since the returns are limited to 3,000 entries total, we will search by state, then aggregate. Progress as you go will be saved to save_file. You can also specify a startdate; this is mostly used internally for updating the cache.
 }
+\details{
+There are over 500,000 NSF grants. This will take hours to run and result in a file almost a gigabyte in size.
+}

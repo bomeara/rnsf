@@ -13,7 +13,8 @@ A data.frame with the original grants data and appended new data
 Adds grants after the last cached ones. Once it is updated
 }
 \examples{
-grants <- nsf_update_cached()
-devtools::use_data(grants, overwrite=TRUE) # if you are updating the package as well
+# not running as it's slow
+# grants <- nsf_update_cached()
+# usethis::use_data(grants, overwrite=TRUE) # if you are updating the package as well
 
 }

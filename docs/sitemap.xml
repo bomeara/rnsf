@@ -1,9 +1,11 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>/404.html</loc></url>
 <url><loc>/LICENSE-text.html</loc></url>
-<url><loc>/README copy.html</loc></url>
 <url><loc>/authors.html</loc></url>
 <url><loc>/index.html</loc></url>
+<url><loc>/reference/abbreviation_to_state.html</loc></url>
+<url><loc>/reference/date_to_academic_semester.html</loc></url>
+<url><loc>/reference/date_to_academic_year.html</loc></url>
 <url><loc>/reference/grants.html</loc></url>
 <url><loc>/reference/index.html</loc></url>
 <url><loc>/reference/nsf_get_all.html</loc></url>

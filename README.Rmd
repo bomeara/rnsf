@@ -33,6 +33,8 @@ remotes::install_github("bomeara/rnsf")
 
 ## Getting cached data
 
+This package caches data on over 500,000 funded NSF grants (it's large, which is why the package will take a while to install, and why it will never be on CRAN with its 5 MB maximum size). You can use it.
+
 ```
 library(rnsf)
 data(grants)
@@ -62,11 +64,11 @@ library(rnsf)
 nsf_wordcloud(ants$abstractText)
 ```
 
-## Bergogram
+## Topic frequency over time
 
-We can plot funding over time, inspired by (but not endorsed by) Jeremy Berg's graphs on federal funding (see <https://jeremymberg.github.io/jeremyberg.github.io/>)
+The ozone hole was discovered in [1985](https://www.usatoday.com/story/news/nation/2025/05/19/what-happened-to-the-hole-in-the-ozone-layer/83644470007/): pollution led to a depletion of the ozone layer, which shields people (and other organisms) from a great deal of UV radiation. The world came together and passed the Montreal Protocol to limit the pollution, chlorofluorocarbons, that was causing the damage. The hole is healing, but still requires research and monitoring. We can see how NSF grants mentioning "ozone hole" changed over time (though not all grants mentioning "ozone hole" study this issue; some could be using it as a comparison to some other issue, for example). We can include a regression before and after 1985.
 
-```{r bergogram, warning=FALSE}
+```{r ozone}
 library(rnsf)
 library(ggplot2)
 library(timeDate)
@@ -74,6 +76,22 @@ library(dplyr)
 library(viridis)
 
 data(grants) # or use grants <- rnsf::nsf_get_all() to get the most current list (will take hours) or grants <- nsf_update_cached() to update from the last cached version
+
+grants$ozone_hole <- grepl("ozone hole", grants$abstractText, ignore.case=TRUE)
+grants$date <- as.Date(grants$date, format="%m/%d/%Y")
+grants$year <- as.numeric(format(grants$date, "%Y"))
+
+grants_by_year <- grants |> group_by(year) |> summarize(ozone = sum(ozone_hole), all = n())  |> ungroup()
+grants_by_year$ozone_percent <- 100 * grants_by_year$ozone / grants_by_year$all
+g <- ggplot(grants_by_year, aes(x=year, y=ozone_percent, group=1)) + geom_point() + theme_minimal() + xlab("Year") + ylab("Percentage of grants mentioning 'ozone hole'") + geom_smooth(data=subset(grants_by_year, year<1985), se=FALSE, method="lm") + geom_smooth(data=subset(grants_by_year, year>=1985), se=FALSE, method="lm")
+print(g)
+```
+
+## Bergogram
+
+We can plot funding over time, inspired by (but not endorsed by) Jeremy Berg's graphs on federal funding (see <https://jeremymberg.github.io/jeremyberg.github.io/>). Also see <https://grant-witness.us/funding_curves.html#nsf-graphs> from Grant Witness.
+
+```{r bergogram, warning=FALSE}
 grants$date <- as.Date(grants$date, format="%m/%d/%Y")
 grants$year <- format(grants$date, "%Y")
 grants$dayofyear <- timeDate::dayOfYear(timeDate::timeDate(grants$date))
@@ -87,11 +105,30 @@ print(g)
 
 ## Table of award info
 
-We can also look at a table with the number, not total money, of grants by state by year, for example (showing just the first few states, and only including this year up to the last cache of the data).
+We can also look at a table with the number, not total money, of grants by state or territory by academic semester, for example (only including this year up to the last cache of the data).
 
 ```{r grantsbyyear}
 library(tidyr)
 library(knitr)
-grants_aggregated <- grants |> filter(year > 2023) |> group_by(year, awardeeStateCode) |> summarise(total_awarded = n(), .groups = "drop_last") |> ungroup() |> tidyr::pivot_wider(names_from = year, values_from=total_awarded, values_fill=0) |> dplyr::arrange(desc(`2024`))
-knitr::kable(head(grants_aggregated,15))
+
+grants$academic_semester <- rnsf::date_to_academic_semester(as.Date(grants$date, format="%m/%d/%Y"))
+grants_aggregated <- grants |> filter(academic_semester %in% apply(expand.grid(c(2024:2026), c(" Fall", "  Spring")), 1, paste0, collapse="")) |> group_by(academic_semester, awardeeStateCode) |> summarise(total_awarded = n(), .groups = "drop_last") |> ungroup() |> tidyr::pivot_wider(names_from = academic_semester, values_from=total_awarded, values_fill=0) |> dplyr::arrange(desc(`2024 Fall`))
+colnames(grants_aggregated) <- gsub("  ", " ", colnames(grants_aggregated))
+colnames(grants_aggregated)[1] <- "Area"
+grants_aggregated[,1] <- rnsf::abbreviation_to_state(unname(unlist(grants_aggregated[,1])))
+knitr::kable(grants_aggregated)
+```
+
+# Updating the package
+
+From the directory containing the package source:
+
+```
+library(rnsf)
+grants <- nsf_update_cached()
+usethis::use_data(grants, overwrite=TRUE)
+devtools::build_readme()
+pkgdown::build_site()
+system("git add */*")
+system("git commit -m'automatic update of page and data' -a")
 ```

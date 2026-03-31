@@ -279,8 +279,9 @@ nsf_get_all <- function(save_file="NSFAllGrants.rda", startdate=NULL) {
 #' Adds grants after the last cached ones. Once it is updated
 #'
 #' @examples
-#' grants <- nsf_update_cached()
-#' usethis::use_data(grants, overwrite=TRUE) # if you are updating the package as well
+#' # not running as it's slow
+#' # grants <- nsf_update_cached()
+#' # usethis::use_data(grants, overwrite=TRUE) # if you are updating the package as well
 #'
 #' @return A data.frame with the original grants data and appended new data
 #' @export
@@ -289,9 +290,9 @@ nsf_update_cached <- function() {
 	dates <- as.Date(grants$date, format = "%m/%d/%Y")
 	most_recent <- max(dates, na.rm=TRUE)
 	next_day <- most_recent+1
-	grants_new <- nsf_get_all(savefile=NULL, startdate=format(next_day, format="%m/%d/%y"))
+	grants_new <- nsf_get_all(startdate=format(next_day, format="%m/%d/%y"))
 	if (nrow(grants_new) > 0) {
-		grants <- grants <- plyr::rbind.fill(grants, grants_new)
+		grants <- plyr::rbind.fill(grants, grants_new)
 	}
 	print(paste0("\n\nIn total, ", nrow(grants_new), " were added, there are now ", nrow(grants), " grants total"))
 	print("Remember, if you are using this to update the data in the package, assuming the results are output into an object called grants, use usethis::use_data(grants, overwrite=TRUE) to update the package")
@@ -350,3 +351,56 @@ nsf_wordcloud <- function(text=nsf_get_all()$abstractText, prune_words=c("will",
 		
 # 	}
 # }
+
+#' Convert to academic year
+#' 
+#' Convert a date like 12/15/2024 to academic year (assumed to start on July 1)
+#' 
+#' @param date A date or vector of dates
+#' @return a character string or vector with the academic year (i.e. "AY2024-2025")
+#' @export 
+#' @examples
+#' dates <- as.Date(c("12/20/2024", "06/01/2021", "09/01/2021"), format="%m/%d/%Y")
+#' print(cbind(format(dates, "%m/%d/%Y"), date_to_academic_year(dates)))
+date_to_academic_year <- function(dates) {
+	years <- as.numeric(format(dates, "%Y"))
+	months <- as.numeric(format(dates, "%m"))
+	years[which(months < 7)] <- years[which(months < 7)]-1
+	results <- paste0("AY", years, "-", years+1)
+	return(results)
+}
+
+#' Convert to academic semester
+#' 
+#' Convert a date like 12/15/2024 to academic semester (2024 Fall). Note that to make it sort correctly, "Spring" is preceded by two spaces so that "2025  Spring" is alphabetically before "2025 Fall".
+#' 
+#' @param date A date or vector of dates
+#' @return a character string or vector with the academic year (i.e. "2024 Fall")
+#' @export 
+#' @examples
+#' dates <- as.Date(c("12/20/2024", "06/01/2021", "09/01/2021"), format="%m/%d/%Y")
+#' print(cbind(format(dates, "%m/%d/%Y"), date_to_academic_semester(dates)))
+date_to_academic_semester <- function(dates) {
+	years <- as.numeric(format(dates, "%Y"))
+	months <- as.numeric(format(dates, "%m"))
+	month_season <- rep(" Fall", length(months))
+	month_season[which(months<=6)] <- "  Spring"
+	results <- paste0(years, month_season)
+	return(results)
+}
+
+#' Convert two-letter symbol to state or territory name
+#'
+#' Goes from "AZ" to "Arizona"
+#'
+#' @param x Vector of abbreviations
+#' @return Vector of state or territory names
+#' @export
+abbreviation_to_state <- function(x) {
+	data(state_codes, package = "USAboundaries")
+	results <- rep(NA, length(x))
+	for (i in sequence(length(results))) {
+		results[i] <- state_codes$state_name[which(state_codes$state_abbr == x[i])]
+	}
+	return(results)
+}

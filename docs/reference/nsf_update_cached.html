@@ -54,10 +54,9 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">grants</span> <span class="op">&lt;-</span> <span class="fu">nsf_update_cached</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in nsf_get_all(savefile = NULL, startdate = format(next_day, format = "%m/%d/%y")):</span> unused argument (savefile = NULL)</span>
-<span class="r-in"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">use_data</span><span class="op">(</span><span class="va">grants</span>, overwrite<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> <span class="co"># if you are updating the package as well</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> 'use_data' is not an exported object from 'namespace:devtools'</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># not running as it's slow</span></span></span>
+<span class="r-in"><span><span class="co"># grants &lt;- nsf_update_cached()</span></span></span>
+<span class="r-in"><span><span class="co"># usethis::use_data(grants, overwrite=TRUE) # if you are updating the package as well</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
