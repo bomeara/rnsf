@@ -71,8 +71,10 @@
 <div class="section level1">
 <h1 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h1>
-<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"remotes"</span>)</span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"bomeara/rnsf"</span>)</span></code></pre></div>
+<p>This package has a huge (&gt;500 MB) R data file containing all the cached grant info (abstracts, money, institutions, etc.). I have stored it as a <a href="https://git-lfs.com" class="external-link">git large file storage file</a> inside <code>data</code>. Thus, the usual approach to installing from github won’t work as the data won’t be loaded in the correct way. Instead, from a terminal or command line, on a computer with git and git-lfs installed, you will have to:</p>
+<p><code>git clone https://github.com/bomeara/rnsf.git</code> (note this is in your computer terminal, not an R session!)</p>
+<p>and then use <code>R CMD INSTALL rnsf</code> to install the package (or, from within R, <code>devtools::install('rnsf')</code> or whatever the path is to the directory you have cloned).</p>
+<p>If someone wants to make an easier way to do this, please reach out!</p>
 </div>
 <div class="section level1">
 <h1 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a>
@@ -81,8 +83,8 @@
 <h2 id="getting-cached-data">Getting cached data<a class="anchor" aria-label="anchor" href="#getting-cached-data"></a>
 </h2>
 <p>This package caches data on over 500,000 funded NSF grants (it’s large, which is why the package will take a while to install, and why it will never be on CRAN with its 5 MB maximum size). You can use it.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">library</span>(rnsf)</span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="fu">data</span>(grants)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(rnsf)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">data</span>(grants)</span></code></pre></div>
 <p>This will give you a data.frame with all data: <code>head(grants)</code></p>
 <p>It has multiple date fields which are in “%m/%d/%Y” format (but everything is stored as a raw list, leaving to the user to process it).</p>
 </div>
@@ -90,7 +92,7 @@
 <h2 id="new-search">New search<a class="anchor" aria-label="anchor" href="#new-search"></a>
 </h2>
 <p>You can also do a new search. For example, to get all info on ants:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">rnsf</span><span class="op">)</span></span>
 <span><span class="va">ants</span> <span class="op">&lt;-</span> <span class="fu">rnsf</span><span class="fu">::</span><span class="fu"><a href="reference/nsf_return.html">nsf_return</a></span><span class="op">(</span>keyword<span class="op">=</span><span class="st">"Formicidae"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Finished first batch"</span></span></code></pre></div>
@@ -103,7 +105,7 @@
 <h2 id="wordcloud">Wordcloud<a class="anchor" aria-label="anchor" href="#wordcloud"></a>
 </h2>
 <p>There is a function for doing a wordcloud:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">rnsf</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/nsf_wordcloud.html">nsf_wordcloud</a></span><span class="op">(</span><span class="va">ants</span><span class="op">$</span><span class="va">abstractText</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-wordcloud-1.png" alt="" width="100%"></p>
@@ -112,7 +114,7 @@
 <h2 id="topic-frequency-over-time">Topic frequency over time<a class="anchor" aria-label="anchor" href="#topic-frequency-over-time"></a>
 </h2>
 <p>The ozone hole was discovered in <a href="https://www.usatoday.com/story/news/nation/2025/05/19/what-happened-to-the-hole-in-the-ozone-layer/83644470007/" class="external-link">1985</a>: pollution led to a depletion of the ozone layer, which shields people (and other organisms) from a great deal of UV radiation. The world came together and passed the Montreal Protocol to limit the pollution, chlorofluorocarbons, that was causing the damage. The hole is healing, but still requires research and monitoring. We can see how NSF grants mentioning “ozone hole” changed over time (though not all grants mentioning “ozone hole” study this issue; some could be using it as a comparison to some other issue, for example). We can include a regression before and after 1985.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">rnsf</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://geobosh.github.io/timeDateDoc/" class="external-link">timeDate</a></span><span class="op">)</span></span>
@@ -148,7 +150,7 @@
 <h2 id="bergogram">Bergogram<a class="anchor" aria-label="anchor" href="#bergogram"></a>
 </h2>
 <p>We can plot funding over time, inspired by (but not endorsed by) Jeremy Berg’s graphs on federal funding (see <a href="https://jeremymberg.github.io/jeremyberg.github.io/" class="external-link uri">https://jeremymberg.github.io/jeremyberg.github.io/</a>). Also see <a href="https://grant-witness.us/funding_curves.html#nsf-graphs" class="external-link uri">https://grant-witness.us/funding_curves.html#nsf-graphs</a> from Grant Witness.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">grants</span><span class="op">$</span><span class="va">date</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="va">grants</span><span class="op">$</span><span class="va">date</span>, format<span class="op">=</span><span class="st">"%m/%d/%Y"</span><span class="op">)</span></span>
 <span><span class="va">grants</span><span class="op">$</span><span class="va">year</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/format.html" class="external-link">format</a></span><span class="op">(</span><span class="va">grants</span><span class="op">$</span><span class="va">date</span>, <span class="st">"%Y"</span><span class="op">)</span></span>
 <span><span class="va">grants</span><span class="op">$</span><span class="va">dayofyear</span> <span class="op">&lt;-</span> <span class="fu">timeDate</span><span class="fu">::</span><span class="fu"><a href="https://geobosh.github.io/timeDateDoc/reference/calendar-dayOfYear.html" class="external-link">dayOfYear</a></span><span class="op">(</span><span class="fu">timeDate</span><span class="fu">::</span><span class="fu"><a href="https://geobosh.github.io/timeDateDoc/reference/timeDate.html" class="external-link">timeDate</a></span><span class="op">(</span><span class="va">grants</span><span class="op">$</span><span class="va">date</span><span class="op">)</span><span class="op">)</span></span>
@@ -164,7 +166,7 @@
 <h2 id="table-of-award-info">Table of award info<a class="anchor" aria-label="anchor" href="#table-of-award-info"></a>
 </h2>
 <p>We can also look at a table with the number, not total money, of grants by state or territory by academic semester, for example (only including this year up to the last cache of the data).</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://yihui.org/knitr/" class="external-link">knitr</a></span><span class="op">)</span></span>
 <span></span>
@@ -640,13 +642,13 @@
 <h1 id="updating-the-package">Updating the package<a class="anchor" aria-label="anchor" href="#updating-the-package"></a>
 </h1>
 <p>From the directory containing the package source:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">library</span>(rnsf)</span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>grants <span class="ot">&lt;-</span> <span class="fu">nsf_update_cached</span>()</span>
-<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_data</span>(grants, <span class="at">overwrite=</span><span class="cn">TRUE</span>)</span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">build_readme</span>()</span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>pkgdown<span class="sc">::</span><span class="fu">build_site</span>()</span>
-<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="fu">system</span>(<span class="st">"git add */*"</span>)</span>
-<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="fu">system</span>(<span class="st">"git commit -m'automatic update of page and data' -a"</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">library</span>(rnsf)</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>grants <span class="ot">&lt;-</span> <span class="fu">nsf_update_cached</span>()</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_data</span>(grants, <span class="at">overwrite=</span><span class="cn">TRUE</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">build_readme</span>()</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>pkgdown<span class="sc">::</span><span class="fu">build_site</span>()</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="fu">system</span>(<span class="st">"git add */*"</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="fu">system</span>(<span class="st">"git commit -m'automatic update of page and data' -a"</span>)</span></code></pre></div>
 </div>
 
   </div>

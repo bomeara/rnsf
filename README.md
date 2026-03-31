@@ -13,8 +13,21 @@ March 28, 2026.
 
 # Installation
 
-    install.packages("remotes")
-    remotes::install_github("bomeara/rnsf")
+This package has a huge (\>500 MB) R data file containing all the cached
+grant info (abstracts, money, institutions, etc.). I have stored it as a
+[git large file storage file](https://git-lfs.com) inside `data`. Thus,
+the usual approach to installing from github won’t work as the data
+won’t be loaded in the correct way. Instead, from a terminal or command
+line, on a computer with git and git-lfs installed, you will have to:
+
+`git clone https://github.com/bomeara/rnsf.git` (note this is in your
+computer terminal, not an R session!)
+
+and then use `R CMD INSTALL rnsf` to install the package (or, from
+within R, `devtools::install('rnsf')` or whatever the path is to the
+directory you have cloned).
+
+If someone wants to make an easier way to do this, please reach out!
 
 # Examples
 
