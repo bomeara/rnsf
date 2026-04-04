@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">rnsf</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2026.03.29.01</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2026.04.04.01</span>
       </span>
     </div>
 
@@ -113,7 +113,7 @@
 <div class="section level2">
 <h2 id="topic-frequency-over-time">Topic frequency over time<a class="anchor" aria-label="anchor" href="#topic-frequency-over-time"></a>
 </h2>
-<p>The ozone hole was discovered in <a href="https://www.usatoday.com/story/news/nation/2025/05/19/what-happened-to-the-hole-in-the-ozone-layer/83644470007/" class="external-link">1985</a>: pollution led to a depletion of the ozone layer, which shields people (and other organisms) from a great deal of UV radiation. The world came together and passed the Montreal Protocol to limit the pollution, chlorofluorocarbons, that was causing the damage. The hole is healing, but still requires research and monitoring. We can see how NSF grants mentioning “ozone hole” changed over time (though not all grants mentioning “ozone hole” study this issue; some could be using it as a comparison to some other issue, for example). We can include a regression before and after 1985.</p>
+<p>The ozone hole was discovered in <a href="https://www.usatoday.com/story/news/nation/2025/05/19/what-happened-to-the-hole-in-the-ozone-layer/83644470007/" class="external-link">1985</a>: pollution led to a depletion of the ozone layer, which shields people (and other organisms) from a great deal of UV radiation. The world came together and passed the Montreal Protocol to limit the pollution, chlorofluorocarbons, that was causing the damage. The hole is healing, but still requires research and monitoring. We can see how NSF grants mentioning “ozone hole” changed over time (though not all grants mentioning “ozone hole” study this issue; some could be using it as a comparison to some other issue, for example). We can include a regression before and after 1985 and show the 95% CI for the proportion in each year (truncated by the y-axis limits).</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">rnsf</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
@@ -129,6 +129,7 @@
 <span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://sjmgarnier.github.io/viridis/" class="external-link">viridis</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: viridisLite</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">binom</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">grants</span><span class="op">)</span> <span class="co"># or use grants &lt;- rnsf::nsf_get_all() to get the most current list (will take hours) or grants &lt;- nsf_update_cached() to update from the last cached version</span></span>
 <span></span>
@@ -138,7 +139,10 @@
 <span></span>
 <span><span class="va">grants_by_year</span> <span class="op">&lt;-</span> <span class="va">grants</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">year</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>ozone <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">ozone_hole</span><span class="op">)</span>, all <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>  <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">grants_by_year</span><span class="op">$</span><span class="va">ozone_percent</span> <span class="op">&lt;-</span> <span class="fl">100</span> <span class="op">*</span> <span class="va">grants_by_year</span><span class="op">$</span><span class="va">ozone</span> <span class="op">/</span> <span class="va">grants_by_year</span><span class="op">$</span><span class="va">all</span></span>
-<span><span class="va">g</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">grants_by_year</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">year</span>, y<span class="op">=</span><span class="va">ozone_percent</span>, group<span class="op">=</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Year"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Percentage of grants mentioning 'ozone hole'"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html" class="external-link">geom_smooth</a></span><span class="op">(</span>data<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">grants_by_year</span>, <span class="va">year</span><span class="op">&lt;</span><span class="fl">1985</span><span class="op">)</span>, se<span class="op">=</span><span class="cn">FALSE</span>, method<span class="op">=</span><span class="st">"lm"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html" class="external-link">geom_smooth</a></span><span class="op">(</span>data<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">grants_by_year</span>, <span class="va">year</span><span class="op">&gt;=</span><span class="fl">1985</span><span class="op">)</span>, se<span class="op">=</span><span class="cn">FALSE</span>, method<span class="op">=</span><span class="st">"lm"</span><span class="op">)</span></span>
+<span><span class="va">grants_by_year</span><span class="op">$</span><span class="va">ozone_lower_percent</span> <span class="op">&lt;-</span> <span class="fl">100</span> <span class="op">*</span> <span class="fu">binom</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/binom/man/binom.confint.html" class="external-link">binom.confint</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">grants_by_year</span><span class="op">$</span><span class="va">ozone</span>, n<span class="op">=</span><span class="va">grants_by_year</span><span class="op">$</span><span class="va">all</span>, method<span class="op">=</span><span class="st">"exact"</span><span class="op">)</span><span class="op">$</span><span class="va">lower</span></span>
+<span><span class="va">grants_by_year</span><span class="op">$</span><span class="va">ozone_upper_percent</span> <span class="op">&lt;-</span> <span class="fl">100</span> <span class="op">*</span> <span class="fu">binom</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/binom/man/binom.confint.html" class="external-link">binom.confint</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">grants_by_year</span><span class="op">$</span><span class="va">ozone</span>, n<span class="op">=</span><span class="va">grants_by_year</span><span class="op">$</span><span class="va">all</span>, method<span class="op">=</span><span class="st">"exact"</span><span class="op">)</span><span class="op">$</span><span class="va">upper</span></span>
+<span><span class="va">grants_by_year</span><span class="op">$</span><span class="va">ozone_upper_percent_truncated</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">grants_by_year</span><span class="op">$</span><span class="va">ozone_upper_percent</span>, <span class="va">min</span>, <span class="fl">2</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">grants_by_year</span><span class="op">$</span><span class="va">ozone_percent</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">g</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">grants_by_year</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">year</span>, y<span class="op">=</span><span class="va">ozone_percent</span>, group<span class="op">=</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_linerange.html" class="external-link">geom_errorbar</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>ymin<span class="op">=</span><span class="va">ozone_lower_percent</span>, ymax<span class="op">=</span><span class="va">ozone_upper_percent_truncated</span><span class="op">)</span>, colour<span class="op">=</span><span class="st">"gray"</span>, alpha<span class="op">=</span><span class="fl">0.4</span>, width<span class="op">=</span><span class="fl">0</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Year"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Percentage of grants mentioning 'ozone hole'"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html" class="external-link">geom_smooth</a></span><span class="op">(</span>data<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">grants_by_year</span>, <span class="va">year</span><span class="op">&lt;</span><span class="fl">1985</span><span class="op">)</span>, se<span class="op">=</span><span class="cn">FALSE</span>, method<span class="op">=</span><span class="st">"lm"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html" class="external-link">geom_smooth</a></span><span class="op">(</span>data<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">grants_by_year</span>, <span class="va">year</span><span class="op">&gt;=</span><span class="fl">1985</span><span class="op">)</span>, se<span class="op">=</span><span class="cn">FALSE</span>, method<span class="op">=</span><span class="st">"lm"</span><span class="op">)</span>  <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/lims.html" class="external-link">ylim</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">2</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">grants_by_year</span><span class="op">$</span><span class="va">ozone_percent</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span></span>
 <span><span class="co">#&gt; `geom_smooth()` using formula = 'y ~ x'</span></span>
 <span><span class="co">#&gt; `geom_smooth()` using formula = 'y ~ x'</span></span>
@@ -637,18 +641,129 @@
 </tbody>
 </table>
 </div>
+<div class="section level2">
+<h2 id="grfp-data">GRFP data<a class="anchor" aria-label="anchor" href="#grfp-data"></a>
+</h2>
+<p>The <a href="https://www.nsfgrfp.org" class="external-link">NSF Graduate Research Fellowship Program</a> (GRFP) is one of NSF’s oldest and most impactful programs: it provides funding for three years of study for people in grad school, giving them flexibility (no need for a research or teaching assistantship); the stipends are also often higher than those for most grad students. Every year, names, affiliations, and research areas of awardees (those receiving the money) and those with honorable mentions are released <a href="https://www.research.gov/grfp/AwardeeList.do?method=loadAwardeeList" class="external-link">here</a> but you can only get one year at a time. I have manually downloaded them all and incorporated them into the package. To use:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">rnsf</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">grfp</span><span class="op">)</span></span></code></pre></div>
+<p>You can then plot information or do other analyses. For example, the number of awards in Mathematical Sciences over time:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">grfp_math</span> <span class="op">&lt;-</span> <span class="va">grfp</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Mathematical Sciences"</span>, <span class="va">grfp</span><span class="op">$</span><span class="va">Field.of.Study</span><span class="op">)</span>,<span class="op">]</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">award_level</span><span class="op">==</span><span class="st">"Awardee"</span><span class="op">)</span></span>
+<span><span class="va">grfp_math</span><span class="op">$</span><span class="va">year</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">grfp_math</span><span class="op">$</span><span class="va">year</span><span class="op">)</span></span>
+<span><span class="va">grfp_math_by_year</span> <span class="op">&lt;-</span> <span class="va">grfp_math</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">year</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>count<span class="op">=</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">g</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">grfp_math_by_year</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">year</span>, y<span class="op">=</span><span class="va">count</span>, group<span class="op">=</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"GRFP Year"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Number of awards in 'Mathematical Sciences'"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-grfpplot-1.png" alt="" width="100%"></p>
+<p>And the frequency of different subfields of math, showing just the first twenty from the past ten years of awards:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://stringr.tidyverse.org" class="external-link">stringr</a></span><span class="op">)</span></span>
+<span><span class="va">subfields</span> <span class="op">&lt;-</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/case.html" class="external-link">str_to_title</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span><span class="st">"Mathematical Sciences - "</span>, <span class="st">""</span>, <span class="va">grfp_math</span><span class="op">$</span><span class="va">Field.of.Study</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">popularity</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">subfields</span><span class="op">)</span>, decreasing<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">popularity</span>, <span class="fl">20</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<table class="table"><tbody>
+<tr>
+<td align="left">Algebra Or Number Theory</td>
+<td align="right">786</td>
+</tr>
+<tr>
+<td align="left">Analysis</td>
+<td align="right">749</td>
+</tr>
+<tr>
+<td align="left">Mathematical Sciences</td>
+<td align="right">539</td>
+</tr>
+<tr>
+<td align="left">Applications Of Mathematics (Including Biometrics And Bi</td>
+<td align="right">465</td>
+</tr>
+<tr>
+<td align="left">Topology</td>
+<td align="right">457</td>
+</tr>
+<tr>
+<td align="left">Algebra, Number Theory, And Combinatorics</td>
+<td align="right">328</td>
+</tr>
+<tr>
+<td align="left">Probability And Statistics</td>
+<td align="right">227</td>
+</tr>
+<tr>
+<td align="left">Applied Mathematics</td>
+<td align="right">221</td>
+</tr>
+<tr>
+<td align="left">Logic Or Foundations Of Mathematics</td>
+<td align="right">172</td>
+</tr>
+<tr>
+<td align="left">Geometry</td>
+<td align="right">139</td>
+</tr>
+<tr>
+<td align="left">Statistics</td>
+<td align="right">125</td>
+</tr>
+<tr>
+<td align="left">Mathematical Biology</td>
+<td align="right">76</td>
+</tr>
+<tr>
+<td align="left">Operations Research</td>
+<td align="right">76</td>
+</tr>
+<tr>
+<td align="left">Biostatistics</td>
+<td align="right">69</td>
+</tr>
+<tr>
+<td align="left">Computational Mathematics</td>
+<td align="right">48</td>
+</tr>
+<tr>
+<td align="left">Geometric Analysis</td>
+<td align="right">34</td>
+</tr>
+<tr>
+<td align="left">Probability</td>
+<td align="right">29</td>
+</tr>
+<tr>
+<td align="left">Computational And Data-Enabled Science</td>
+<td align="right">24</td>
+</tr>
+<tr>
+<td align="left">Computational Statistics</td>
+<td align="right">15</td>
+</tr>
+<tr>
+<td align="left">Artificial Intelligence</td>
+<td align="right">13</td>
+</tr>
+</tbody></table>
+</div>
 </div>
 <div class="section level1">
 <h1 id="updating-the-package">Updating the package<a class="anchor" aria-label="anchor" href="#updating-the-package"></a>
 </h1>
-<p>From the directory containing the package source:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">library</span>(rnsf)</span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>grants <span class="ot">&lt;-</span> <span class="fu">nsf_update_cached</span>()</span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_data</span>(grants, <span class="at">overwrite=</span><span class="cn">TRUE</span>)</span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">build_readme</span>()</span>
-<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>pkgdown<span class="sc">::</span><span class="fu">build_site</span>()</span>
-<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="fu">system</span>(<span class="st">"git add */*"</span>)</span>
-<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="fu">system</span>(<span class="st">"git commit -m'automatic update of page and data' -a"</span>)</span></code></pre></div>
+<p>First, update the package version in the DESCRIPTION.</p>
+<p>Then the directory containing the package source:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">library</span>(rnsf)</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>grants <span class="ot">&lt;-</span> <span class="fu">nsf_update_cached</span>()</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_data</span>(grants, <span class="at">overwrite=</span><span class="cn">TRUE</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">build_readme</span>()</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>pkgdown<span class="sc">::</span><span class="fu">build_site</span>()</span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="fu">system</span>(<span class="st">"git add */*"</span>)</span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a><span class="fu">system</span>(<span class="st">"git commit -m'automatic update of page and data' -a"</span>)</span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a><span class="fu">system</span>(<span class="st">"git push"</span>)</span></code></pre></div>
+<p>If new GRFP results are out, download them, retitle them as Awardee or HonorableMention with year and .tsv (i.e., “Awardee2030.tsv”) and put them in the inst/extdata directory in the package source. Reinstall the package. Then,</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="fu">library</span>(rnsf)</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>grfp <span class="ot">&lt;-</span> <span class="fu">compile_grfp</span>()</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_data</span>(grfp, <span class="at">overwrite=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<p>Then do the usual git things.</p>
 </div>
 
   </div>

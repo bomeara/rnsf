@@ -69,7 +69,7 @@ nsf_wordcloud(ants$abstractText)
 
 ## Topic frequency over time
 
-The ozone hole was discovered in [1985](https://www.usatoday.com/story/news/nation/2025/05/19/what-happened-to-the-hole-in-the-ozone-layer/83644470007/): pollution led to a depletion of the ozone layer, which shields people (and other organisms) from a great deal of UV radiation. The world came together and passed the Montreal Protocol to limit the pollution, chlorofluorocarbons, that was causing the damage. The hole is healing, but still requires research and monitoring. We can see how NSF grants mentioning "ozone hole" changed over time (though not all grants mentioning "ozone hole" study this issue; some could be using it as a comparison to some other issue, for example). We can include a regression before and after 1985.
+The ozone hole was discovered in [1985](https://www.usatoday.com/story/news/nation/2025/05/19/what-happened-to-the-hole-in-the-ozone-layer/83644470007/): pollution led to a depletion of the ozone layer, which shields people (and other organisms) from a great deal of UV radiation. The world came together and passed the Montreal Protocol to limit the pollution, chlorofluorocarbons, that was causing the damage. The hole is healing, but still requires research and monitoring. We can see how NSF grants mentioning "ozone hole" changed over time (though not all grants mentioning "ozone hole" study this issue; some could be using it as a comparison to some other issue, for example). We can include a regression before and after 1985 and show the 95% CI for the proportion in each year (truncated by the y-axis limits).
 
 ```{r ozone}
 library(rnsf)
@@ -77,6 +77,7 @@ library(ggplot2)
 library(timeDate)
 library(dplyr)
 library(viridis)
+library(binom)
 
 data(grants) # or use grants <- rnsf::nsf_get_all() to get the most current list (will take hours) or grants <- nsf_update_cached() to update from the last cached version
 
@@ -86,7 +87,10 @@ grants$year <- as.numeric(format(grants$date, "%Y"))
 
 grants_by_year <- grants |> group_by(year) |> summarize(ozone = sum(ozone_hole), all = n())  |> ungroup()
 grants_by_year$ozone_percent <- 100 * grants_by_year$ozone / grants_by_year$all
-g <- ggplot(grants_by_year, aes(x=year, y=ozone_percent, group=1)) + geom_point() + theme_minimal() + xlab("Year") + ylab("Percentage of grants mentioning 'ozone hole'") + geom_smooth(data=subset(grants_by_year, year<1985), se=FALSE, method="lm") + geom_smooth(data=subset(grants_by_year, year>=1985), se=FALSE, method="lm")
+grants_by_year$ozone_lower_percent <- 100 * binom::binom.confint(x=grants_by_year$ozone, n=grants_by_year$all, method="exact")$lower
+grants_by_year$ozone_upper_percent <- 100 * binom::binom.confint(x=grants_by_year$ozone, n=grants_by_year$all, method="exact")$upper
+grants_by_year$ozone_upper_percent_truncated <- sapply(grants_by_year$ozone_upper_percent, min, 2*max(grants_by_year$ozone_percent))
+g <- ggplot(grants_by_year, aes(x=year, y=ozone_percent, group=1))+ geom_errorbar(aes(ymin=ozone_lower_percent, ymax=ozone_upper_percent_truncated), colour="gray", alpha=0.4, width=0) + geom_point() + theme_minimal() + xlab("Year") + ylab("Percentage of grants mentioning 'ozone hole'") + geom_smooth(data=subset(grants_by_year, year<1985), se=FALSE, method="lm") + geom_smooth(data=subset(grants_by_year, year>=1985), se=FALSE, method="lm")  + ylim(c(0, 2*max(grants_by_year$ozone_percent)))
 print(g)
 ```
 
@@ -122,9 +126,39 @@ grants_aggregated[,1] <- rnsf::abbreviation_to_state(unname(unlist(grants_aggreg
 knitr::kable(grants_aggregated)
 ```
 
+## GRFP data
+
+The [NSF Graduate Research Fellowship Program](https://www.nsfgrfp.org) (GRFP) is one of NSF's oldest and most impactful programs: it provides funding for three years of study for people in grad school, giving them flexibility (no need for a research or teaching assistantship); the stipends are also often higher than those for most grad students. Every year, names, affiliations, and research areas of awardees (those receiving the money) and those with honorable mentions are released [here](https://www.research.gov/grfp/AwardeeList.do?method=loadAwardeeList) but you can only get one year at a time. I have manually downloaded them all and incorporated them into the package. To use:
+
+```{r grfp}
+library(rnsf)
+data(grfp)
+```
+
+You can then plot information or do other analyses. For example, the number of awards in Mathematical Sciences over time:
+
+```{r grfpplot}
+grfp_math <- grfp[grepl("Mathematical Sciences", grfp$Field.of.Study),] |> subset(award_level=="Awardee")
+grfp_math$year <- as.numeric(grfp_math$year)
+grfp_math_by_year <- grfp_math |> group_by(year) |> summarize(count=n()) |> ungroup()
+g <- ggplot(grfp_math_by_year, aes(x=year, y=count, group=1)) + geom_line() + theme_minimal() + xlab("GRFP Year") + ylab("Number of awards in 'Mathematical Sciences'")
+print(g)
+```
+
+And the frequency of different subfields of math, showing just the first twenty from the past ten years of awards:
+
+```{r grfpsubfields}
+library(stringr)
+subfields <- stringr::str_to_title(gsub("Mathematical Sciences - ", "", grfp_math$Field.of.Study))
+popularity <- t(t(sort(table(subfields), decreasing=TRUE)))
+knitr::kable(head(popularity, 20))
+```
+
 # Updating the package
 
-From the directory containing the package source:
+First, update the package version in the DESCRIPTION.
+
+Then the directory containing the package source:
 
 ```
 library(rnsf)
@@ -134,4 +168,15 @@ devtools::build_readme()
 pkgdown::build_site()
 system("git add */*")
 system("git commit -m'automatic update of page and data' -a")
+system("git push")
 ```
+
+If new GRFP results are out, download them, retitle them as Awardee or HonorableMention with year and .tsv (i.e., "Awardee2030.tsv") and put them in the inst/extdata directory in the package source. Reinstall the package. Then,
+
+```
+library(rnsf)
+grfp <- compile_grfp()
+usethis::use_data(grfp, overwrite=TRUE)
+```
+
+Then do the usual git things. 

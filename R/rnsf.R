@@ -301,9 +301,16 @@ nsf_update_cached <- function() {
 
 #' Grant information
 #'
-#' A dataset of NSF awards from its start until the package was last updated (March 28, 2026)
+#' A dataset of NSF awards from its start until the package was last updated
 #' @format A data frame with one row per award and columns with award information
 "grants"
+
+
+#' GRFP information
+#'
+#' A dataset of NSF GRFP awards and honorable mentions from its start until the package was last updated
+#' @format A data frame with one row per award and columns with award information
+"grfp"
 
 #' Text wordcloud
 #'
@@ -344,13 +351,6 @@ nsf_wordcloud <- function(text=nsf_get_all()$abstractText, prune_words=c("will",
   d <- data.frame(word = names(v),freq=v)
   wordcloud::wordcloud(words = d$word, freq = d$freq, random.order = FALSE, ...)
 }
-
-# compile_grfp_information <- function() {
-# 	raw_grfp_files <- system.files("extdata", package="rnsf", full.names=TRUE)
-# 	for (file_name in raw_grfp_files) {
-		
-# 	}
-# }
 
 #' Convert to academic year
 #' 
@@ -403,4 +403,78 @@ abbreviation_to_state <- function(x) {
 		results[i] <- state_codes$state_name[which(state_codes$state_abbr == x[i])]
 	}
 	return(results)
+}
+
+#' Collapse list columns
+#' 
+#' Some grants columns are lists as they may have multiple entries. This will collapse them with semicolons between each entry. Note that this will be SLOW on a large grants data.frame.
+#' 
+#' @param grants A data.frame of grant info
+#' @return A data.frame of grant info where each column is a "normal" vector: character, numeric, etc.
+#' @export 
+flatten_list_columns <- function(grants) {
+	grants2 <- data.frame(matrix(nrow=nrow(grants), ncol=ncol(grants)))
+	for (i in sequence(ncol(grants))) {
+		cat("\r Converting column ", i)
+		grants2[, i] <- sapply(grants[, i], paste0, collapse = "; ")	
+	}	
+	return(grants2)
+}
+
+#' Save CSVs of grants by decade
+#' 
+#' This will save a CSV of all grants by decade (to make it easier to get the relevant files)
+#' 
+#' @param grants A data.frame of grant info
+#' @param path Where to save the files
+#' @return Nothing, but the files will appear in the correct directory
+#' @export 
+save_grant_csvs <- function(grants, path) {
+	grants_flat <- flatten_list_columns(grants)
+	grants_flat$year <- as.numeric(format(as.Date(grants_flat$date, format="%m/%d/%Y"), format="%Y"))
+	grants_flat$academic_semester <- date_to_academic_semester(
+		as.Date(grants_flat$date,
+		format = "%m/%d/%Y")
+	)
+	year_range <- range(grants_flat$year, na.rm=TRUE)
+	start_year <- 10*floor(year_range[1]/10)
+	min_years <- seq(from=start_year, to = year_range[2], by=10)
+	grants_flat <- subset(grants_flat, !is.na(grants_flat$year))
+	for (min_year in sequence(min_years)) {
+		max_year <- min_year+9
+		grants_flat_local <- subset(grants_flat, year>=min_year & year<=max_year)
+		write.csv(grants_flat_local, file.path(path, paste0("NSF_grants_", min_year, "_to_", max_year, ".csv")))
+	}
+	return(NULL)
+}
+
+#' Compile GRFP data from the external data in the package
+#' 
+#' NSF releases GRFP information separately from other grant information, in two excel sheets per year: one for honorable mention, one for awards. These are downloaded as "xls" files but are actually "tsv" files. I have manually downloaded them for every year and stored them in `inst/extdata`. This function will compile them into one document. Package developers can then cache it in the package. For most users, just `data(grfp)` will be all you need to do to load in the data.
+#' @return A data.frame of all GRFP data
+#' @export
+#' @examples 
+#' #Not run
+#' #grfp <- compile_grfp()
+#' #usethis::use_data(grfp, overwrite=TRUE) # if you are updating the package as well
+compile_grfp <- function() {
+	all_files <- list.files(
+		system.file("extdata", package = "rnsf"),
+		,
+		full.names = TRUE,
+		pattern = "Honorable.*|Awardee.*"
+	)
+	grfp <- data.frame()
+	for (file_index in sequence(length(all_files))) {
+		file_name <- all_files[file_index]
+		award_level <- stringr::str_extract(file_name, "Awardee|HonorableMention")
+		year <- stringr::str_match(file_name, "(\\d\\d\\d\\d)\\.tsv")[2]
+		if(!is.na(award_level) & !is.na(year)) {
+			entry <- read.delim(file_name)
+			entry$year <- year
+			entry$award_level <- award_level
+		}
+		grfp <- plyr::rbind.fill(grfp, entry)
+	}
+	return(grfp)
 }

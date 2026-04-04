@@ -80,7 +80,8 @@ but still requires research and monitoring. We can see how NSF grants
 mentioning “ozone hole” changed over time (though not all grants
 mentioning “ozone hole” study this issue; some could be using it as a
 comparison to some other issue, for example). We can include a
-regression before and after 1985.
+regression before and after 1985 and show the 95% CI for the proportion
+in each year (truncated by the y-axis limits).
 
 ``` r
 library(rnsf)
@@ -97,6 +98,7 @@ library(dplyr)
 #>     intersect, setdiff, setequal, union
 library(viridis)
 #> Loading required package: viridisLite
+library(binom)
 
 data(grants) # or use grants <- rnsf::nsf_get_all() to get the most current list (will take hours) or grants <- nsf_update_cached() to update from the last cached version
 
@@ -106,7 +108,10 @@ grants$year <- as.numeric(format(grants$date, "%Y"))
 
 grants_by_year <- grants |> group_by(year) |> summarize(ozone = sum(ozone_hole), all = n())  |> ungroup()
 grants_by_year$ozone_percent <- 100 * grants_by_year$ozone / grants_by_year$all
-g <- ggplot(grants_by_year, aes(x=year, y=ozone_percent, group=1)) + geom_point() + theme_minimal() + xlab("Year") + ylab("Percentage of grants mentioning 'ozone hole'") + geom_smooth(data=subset(grants_by_year, year<1985), se=FALSE, method="lm") + geom_smooth(data=subset(grants_by_year, year>=1985), se=FALSE, method="lm")
+grants_by_year$ozone_lower_percent <- 100 * binom::binom.confint(x=grants_by_year$ozone, n=grants_by_year$all, method="exact")$lower
+grants_by_year$ozone_upper_percent <- 100 * binom::binom.confint(x=grants_by_year$ozone, n=grants_by_year$all, method="exact")$upper
+grants_by_year$ozone_upper_percent_truncated <- sapply(grants_by_year$ozone_upper_percent, min, 2*max(grants_by_year$ozone_percent))
+g <- ggplot(grants_by_year, aes(x=year, y=ozone_percent, group=1))+ geom_errorbar(aes(ymin=ozone_lower_percent, ymax=ozone_upper_percent_truncated), colour="gray", alpha=0.4, width=0) + geom_point() + theme_minimal() + xlab("Year") + ylab("Percentage of grants mentioning 'ozone hole'") + geom_smooth(data=subset(grants_by_year, year<1985), se=FALSE, method="lm") + geom_smooth(data=subset(grants_by_year, year>=1985), se=FALSE, method="lm")  + ylim(c(0, 2*max(grants_by_year$ozone_percent)))
 print(g)
 #> `geom_smooth()` using formula = 'y ~ x'
 #> `geom_smooth()` using formula = 'y ~ x'
@@ -214,9 +219,75 @@ knitr::kable(grants_aggregated)
 | American Samoa | 0 | 1 | 0 | 0 | 0 |
 | Guam | 0 | 0 | 2 | 1 | 0 |
 
+## GRFP data
+
+The [NSF Graduate Research Fellowship Program](https://www.nsfgrfp.org)
+(GRFP) is one of NSF’s oldest and most impactful programs: it provides
+funding for three years of study for people in grad school, giving them
+flexibility (no need for a research or teaching assistantship); the
+stipends are also often higher than those for most grad students. Every
+year, names, affiliations, and research areas of awardees (those
+receiving the money) and those with honorable mentions are released
+[here](https://www.research.gov/grfp/AwardeeList.do?method=loadAwardeeList)
+but you can only get one year at a time. I have manually downloaded them
+all and incorporated them into the package. To use:
+
+``` r
+library(rnsf)
+data(grfp)
+```
+
+You can then plot information or do other analyses. For example, the
+number of awards in Mathematical Sciences over time:
+
+``` r
+grfp_math <- grfp[grepl("Mathematical Sciences", grfp$Field.of.Study),] |> subset(award_level=="Awardee")
+grfp_math$year <- as.numeric(grfp_math$year)
+grfp_math_by_year <- grfp_math |> group_by(year) |> summarize(count=n()) |> ungroup()
+g <- ggplot(grfp_math_by_year, aes(x=year, y=count, group=1)) + geom_line() + theme_minimal() + xlab("GRFP Year") + ylab("Number of awards in 'Mathematical Sciences'")
+print(g)
+```
+
+<img src="man/figures/README-grfpplot-1.png" alt="" width="100%" />
+
+And the frequency of different subfields of math, showing just the first
+twenty from the past ten years of awards:
+
+``` r
+library(stringr)
+subfields <- stringr::str_to_title(gsub("Mathematical Sciences - ", "", grfp_math$Field.of.Study))
+popularity <- t(t(sort(table(subfields), decreasing=TRUE)))
+knitr::kable(head(popularity, 20))
+```
+
+|                                                          |     |
+|:---------------------------------------------------------|----:|
+| Algebra Or Number Theory                                 | 786 |
+| Analysis                                                 | 749 |
+| Mathematical Sciences                                    | 539 |
+| Applications Of Mathematics (Including Biometrics And Bi | 465 |
+| Topology                                                 | 457 |
+| Algebra, Number Theory, And Combinatorics                | 328 |
+| Probability And Statistics                               | 227 |
+| Applied Mathematics                                      | 221 |
+| Logic Or Foundations Of Mathematics                      | 172 |
+| Geometry                                                 | 139 |
+| Statistics                                               | 125 |
+| Mathematical Biology                                     |  76 |
+| Operations Research                                      |  76 |
+| Biostatistics                                            |  69 |
+| Computational Mathematics                                |  48 |
+| Geometric Analysis                                       |  34 |
+| Probability                                              |  29 |
+| Computational And Data-Enabled Science                   |  24 |
+| Computational Statistics                                 |  15 |
+| Artificial Intelligence                                  |  13 |
+
 # Updating the package
 
-From the directory containing the package source:
+First, update the package version in the DESCRIPTION.
+
+Then the directory containing the package source:
 
     library(rnsf)
     grants <- nsf_update_cached()
@@ -225,3 +296,15 @@ From the directory containing the package source:
     pkgdown::build_site()
     system("git add */*")
     system("git commit -m'automatic update of page and data' -a")
+    system("git push")
+
+If new GRFP results are out, download them, retitle them as Awardee or
+HonorableMention with year and .tsv (i.e., “Awardee2030.tsv”) and put
+them in the inst/extdata directory in the package source. Reinstall the
+package. Then,
+
+    library(rnsf)
+    grfp <- compile_grfp()
+    usethis::use_data(grfp, overwrite=TRUE)
+
+Then do the usual git things.
