@@ -6,7 +6,7 @@
 Unofficial package to interface with NSF API
 
 It also has abstracts, dates, and more information for all grants up to
-March 28, 2026.
+April 11, 2026.
 
 - Webpage with package information: <https://bomeara.github.io/rnsf/>
 - Github page: <https://github.com/bomeara/rnsf/>
