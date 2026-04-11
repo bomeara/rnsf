@@ -4,7 +4,7 @@
 \alias{save_grant_csvs}
 \title{Save CSVs of grants by decade}
 \usage{
-save_grant_csvs(grants, path)
+save_grant_csvs(grants, path = ".")
 }
 \arguments{
 \item{grants}{A data.frame of grant info}

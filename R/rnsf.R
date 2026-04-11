@@ -267,7 +267,9 @@ nsf_get_all <- function(save_file="NSFAllGrants.rda", startdate=NULL) {
 			end_time <- Sys.time()
 			print(paste0("\nFound ", nrow(new_grants), " grants, making for ", nrow(grants), " grants in total"))
 			print(end_time - start_time)
-			save(grants, file = save_file)
+			if(!is.null(save_file)) {
+				save(grants, file = save_file)
+			}
 		}
 	}, silent=TRUE)
   }
@@ -290,7 +292,7 @@ nsf_update_cached <- function() {
 	dates <- as.Date(grants$date, format = "%m/%d/%Y")
 	most_recent <- max(dates, na.rm=TRUE)
 	next_day <- most_recent+1
-	grants_new <- nsf_get_all(startdate=format(next_day, format="%m/%d/%y"))
+	grants_new <- nsf_get_all(save_file=NULL, startdate=format(next_day, format="%m/%d/%y"))
 	if (nrow(grants_new) > 0) {
 		grants <- plyr::rbind.fill(grants, grants_new)
 	}
@@ -414,6 +416,7 @@ abbreviation_to_state <- function(x) {
 #' @export 
 flatten_list_columns <- function(grants) {
 	grants2 <- data.frame(matrix(nrow=nrow(grants), ncol=ncol(grants)))
+	colnames(grants2) <- colnames(grants)
 	for (i in sequence(ncol(grants))) {
 		cat("\r Converting column ", i)
 		grants2[, i] <- sapply(grants[, i], paste0, collapse = "; ")	
@@ -429,7 +432,7 @@ flatten_list_columns <- function(grants) {
 #' @param path Where to save the files
 #' @return Nothing, but the files will appear in the correct directory
 #' @export 
-save_grant_csvs <- function(grants, path) {
+save_grant_csvs <- function(grants, path=".") {
 	grants_flat <- flatten_list_columns(grants)
 	grants_flat$year <- as.numeric(format(as.Date(grants_flat$date, format="%m/%d/%Y"), format="%Y"))
 	grants_flat$academic_semester <- date_to_academic_semester(
@@ -440,10 +443,11 @@ save_grant_csvs <- function(grants, path) {
 	start_year <- 10*floor(year_range[1]/10)
 	min_years <- seq(from=start_year, to = year_range[2], by=10)
 	grants_flat <- subset(grants_flat, !is.na(grants_flat$year))
-	for (min_year in sequence(min_years)) {
+	for (min_year_index in sequence(length(min_years))) {
+		min_year <- min_years[min_year_index]
 		max_year <- min_year+9
 		grants_flat_local <- subset(grants_flat, year>=min_year & year<=max_year)
-		write.csv(grants_flat_local, file.path(path, paste0("NSF_grants_", min_year, "_to_", max_year, ".csv")))
+		write.csv(grants_flat_local, file=file.path(path, paste0("NSF_grants_", min_year, "_to_", max_year, ".csv")))
 	}
 	return(NULL)
 }
