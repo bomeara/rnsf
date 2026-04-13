@@ -263,25 +263,25 @@ knitr::kable(head(popularity, 20))
 |                                                          |     |
 |:---------------------------------------------------------|----:|
 | Algebra Or Number Theory                                 | 786 |
-| Analysis                                                 | 749 |
+| Analysis                                                 | 758 |
 | Mathematical Sciences                                    | 539 |
+| Topology                                                 | 466 |
 | Applications Of Mathematics (Including Biometrics And Bi | 465 |
-| Topology                                                 | 457 |
-| Algebra, Number Theory, And Combinatorics                | 328 |
+| Algebra, Number Theory, And Combinatorics                | 359 |
+| Applied Mathematics                                      | 239 |
 | Probability And Statistics                               | 227 |
-| Applied Mathematics                                      | 221 |
 | Logic Or Foundations Of Mathematics                      | 172 |
 | Geometry                                                 | 139 |
-| Statistics                                               | 125 |
-| Mathematical Biology                                     |  76 |
+| Statistics                                               | 131 |
+| Mathematical Biology                                     |  84 |
 | Operations Research                                      |  76 |
-| Biostatistics                                            |  69 |
-| Computational Mathematics                                |  48 |
-| Geometric Analysis                                       |  34 |
-| Probability                                              |  29 |
-| Computational And Data-Enabled Science                   |  24 |
-| Computational Statistics                                 |  15 |
-| Artificial Intelligence                                  |  13 |
+| Biostatistics                                            |  70 |
+| Computational Mathematics                                |  51 |
+| Geometric Analysis                                       |  37 |
+| Probability                                              |  31 |
+| Computational And Data-Enabled Science                   |  25 |
+| Artificial Intelligence                                  |  16 |
+| Computational Statistics                                 |  16 |
 
 # Updating the package
 
