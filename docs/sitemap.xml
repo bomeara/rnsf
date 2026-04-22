@@ -15,6 +15,7 @@
 <url><loc>/reference/nsf_get_person.html</loc></url>
 <url><loc>/reference/nsf_return.html</loc></url>
 <url><loc>/reference/nsf_update_cached.html</loc></url>
+<url><loc>/reference/nsf_update_cached_this_year.html</loc></url>
 <url><loc>/reference/nsf_wordcloud.html</loc></url>
 <url><loc>/reference/save_grant_csvs.html</loc></url>
 </urlset>

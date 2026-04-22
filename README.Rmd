@@ -9,7 +9,10 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "100%"
+  out.width = "100%",
+  fig.height = 7,
+  fig.width = 7,
+  fig.dpi = 600
 )
 ```
 
@@ -118,12 +121,49 @@ We can also look at a table with the number, not total money, of grants by state
 library(tidyr)
 library(knitr)
 
+data(grants)
+grants$awardeeStateCode <- toupper(grants$awardeeStateCode) # handle some early data that uses lowercase
 grants$academic_semester <- rnsf::date_to_academic_semester(as.Date(grants$date, format="%m/%d/%Y"))
 grants_aggregated <- grants |> filter(academic_semester %in% apply(expand.grid(c(2024:2026), c(" Fall", "  Spring")), 1, paste0, collapse="")) |> group_by(academic_semester, awardeeStateCode) |> summarise(total_awarded = n(), .groups = "drop_last") |> ungroup() |> tidyr::pivot_wider(names_from = academic_semester, values_from=total_awarded, values_fill=0) |> dplyr::arrange(desc(`2024 Fall`))
 colnames(grants_aggregated) <- gsub("  ", " ", colnames(grants_aggregated))
 colnames(grants_aggregated)[1] <- "Area"
 grants_aggregated[,1] <- rnsf::abbreviation_to_state(unname(unlist(grants_aggregated[,1])))
 knitr::kable(grants_aggregated)
+```
+
+## Recent info
+
+We can see when the most recent grant has been awarded (relative to when this package was last built) by state or territory; we can also look to see how funding so far this year compares to average funding at this point of the year for 2017-2024 (so it encompasses two different administrations).
+
+```{r recent}
+library(lubridate)
+library(ggrepel)
+
+data(grants)
+
+current_day_of_year <- lubridate::yday(Sys.Date())
+grants_modified <- grants
+grants_modified$awardeeStateCode <- toupper(grants_modified$awardeeStateCode) # handle some early data that uses lowercase
+grants_modified$date_formatted <- as.Date(grants_modified$date, format="%m/%d/%Y")
+grants_modified <- grants_modified[!is.na(grants_modified$date_formatted),]
+grants_modified$day_of_year <- lubridate::yday(grants_modified$date_formatted)
+grants_modified$year <- as.numeric(format(grants_modified$date_formatted, "%Y"))
+grants_modified$funds <- as.numeric(grants_modified$fundsObligatedAmt)
+grants_recent <- grants_modified |> group_by(awardeeStateCode) |> summarize(most_recent = max(date_formatted), days_since_grant = Sys.Date() - max(date_formatted))
+
+grants_2026 <- subset(grants_modified, year==2026)
+grants_2017_2024 <- subset(grants_modified, year>= 2017 & year <=2024) # so we have 8 years of data across two admins
+grants_2017_2024 <- subset(grants_2017_2024, day_of_year < current_day_of_year) # so we compare similar
+grants_aggregated_2026 <- grants_2026 |> group_by(awardeeStateCode) |> summarize(funds_per_year_2026 = sum(funds)) |> arrange(awardeeStateCode) |> ungroup()
+grants_aggregated_2017_2024 <- grants_2017_2024 |> group_by(awardeeStateCode) |> summarize(funds_per_year_8 = sum(funds)/8) |> arrange(awardeeStateCode) |> ungroup()
+grants_comparison <- full_join(full_join(grants_aggregated_2017_2024, grants_aggregated_2026), grants_recent)
+grants_comparison$funds_per_year_2026[is.na(grants_comparison$funds_per_year_2026)] <- 0
+grants_comparison <- subset(grants_comparison, !is.na(grants_comparison$funds_per_year_8)) # rarely get funding
+grants_comparison <- subset(grants_comparison, grants_comparison$funds_per_year_8>50000) # eliminate entities which have traditionally low, rare funding as they make it hard to see the wait times for the others 
+grants_comparison$percentage_usual_funding_by_this_date <- 100*grants_comparison$funds_per_year_2026 / grants_comparison$funds_per_year_8
+grants_comparison$days_since_grant <- as.numeric(grants_comparison$days_since_grant)
+g <- ggplot(grants_comparison, aes(x=days_since_grant, y=percentage_usual_funding_by_this_date, label=awardeeStateCode)) + geom_text_repel(max.overlaps=50, alpha=0.8) + theme_minimal() + xlab("Days since most recent grant") + ylab("2026 percentage of usual funding by this date") + geom_point(alpha=0.5) + scale_x_continuous(trans='log1p', breaks=c(1, 7, 30, 90, 120, 365, 2*365), limits=c(0, NA)) 
+print(g)
 ```
 
 ## GRFP data
@@ -162,8 +202,17 @@ Then the directory containing the package source:
 
 ```
 library(rnsf)
-grants <- nsf_update_cached()
-usethis::use_data(grants, overwrite=TRUE)
+grants <- nsf_update_cached_this_year() # perhaps worth doing a new nsf_get_all() after the beginning of the year
+usethis::use_data(grants, overwrite=TRUE) 
+devtools::install()
+```
+
+Then quit R and reopen (so it uses the latest saved grants).
+
+Then:
+
+```
+library(rnsf)
 devtools::build_readme()
 pkgdown::build_site()
 system("git add */*")

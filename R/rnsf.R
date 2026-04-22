@@ -278,7 +278,7 @@ nsf_get_all <- function(save_file="NSFAllGrants.rda", startdate=NULL) {
 
 #' Update cached information
 #'
-#' Adds grants after the last cached ones. Once it is updated
+#' Adds grants after the last cached ones. However, it seemed to only add 60 grants in total; use nsf_update_cached_this_year() instead, or nsf_get_all() to get a new pull of every grant (takes days)
 #'
 #' @examples
 #' # not running as it's slow
@@ -298,6 +298,31 @@ nsf_update_cached <- function() {
 	}
 	print(paste0("\n\nIn total, ", nrow(grants_new), " were added, there are now ", nrow(grants), " grants total"))
 	print("Remember, if you are using this to update the data in the package, assuming the results are output into an object called grants, use usethis::use_data(grants, overwrite=TRUE) to update the package")
+	return(grants)
+}
+
+#' Update cached information
+#'
+#' Adds grants, pulling all the ones from this year.
+#'
+#' @examples
+#' # not running as it's slow
+#' # grants <- nsf_update_cached_this_year()
+#' # usethis::use_data(grants, overwrite=TRUE) # if you are updating the package as well
+#'
+#' @return A data.frame with the original grants data and appended new data
+#' @export
+nsf_update_cached_this_year <- function() {
+	data(grants)
+	dates <- as.Date(grants$date, format = "%m/%d/%Y")
+	grants$year <- as.numeric(format(dates, "%Y"))
+	current_year <- as.numeric(format(Sys.Date(), "%Y"))
+	grants_through_last_year <- subset(grants, year<current_year)
+	grants_cached_this_year <- subset(grants, year==current_year)
+	grants_through_last_year$year <- NULL
+	grants_this_year <- nsf_get_all(save_file = NULL, startdate = paste0("01/01/", current_year))
+	grants <- dplyr::bind_rows(grants_through_last_year, grants_this_year)
+	print(paste0("originally had ", nrow(grants_cached_this_year), " for this year, now have ", nrow(grants_this_year), "; there are ", nrow(grants), " grants total"))
 	return(grants)
 }
 

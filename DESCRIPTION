@@ -1,6 +1,6 @@
 Package: rnsf
 Title: Interface to the NSF Grants API
-Version: 2026.04.11.01
+Version: 2026.04.22.01
 Authors@R: person("Brian", "O'Meara", email = "omeara.brian@gmail.com", role = c("aut", "cre"))
 Description: Uses the United States' National Science Foundation (NSF) API (https://www.research.gov/common/webapi/awardapisearch-v1.htm) to download info on awards (grants for funding science). Also includes functions for visualizing and analyzing the data.
 Depends: R (>= 3.5.0)

@@ -115,8 +115,6 @@ g <- ggplot(grants_by_year, aes(x=year, y=ozone_percent, group=1))+ geom_errorba
 print(g)
 #> `geom_smooth()` using formula = 'y ~ x'
 #> `geom_smooth()` using formula = 'y ~ x'
-#> Warning: Removed 1 row containing missing values or values outside the scale range
-#> (`geom_point()`).
 ```
 
 <img src="man/figures/README-ozone-1.png" alt="" width="100%" />
@@ -153,6 +151,8 @@ this year up to the last cache of the data).
 library(tidyr)
 library(knitr)
 
+data(grants)
+grants$awardeeStateCode <- toupper(grants$awardeeStateCode) # handle some early data that uses lowercase
 grants$academic_semester <- rnsf::date_to_academic_semester(as.Date(grants$date, format="%m/%d/%Y"))
 grants_aggregated <- grants |> filter(academic_semester %in% apply(expand.grid(c(2024:2026), c(" Fall", "  Spring")), 1, paste0, collapse="")) |> group_by(academic_semester, awardeeStateCode) |> summarise(total_awarded = n(), .groups = "drop_last") |> ungroup() |> tidyr::pivot_wider(names_from = academic_semester, values_from=total_awarded, values_fill=0) |> dplyr::arrange(desc(`2024 Fall`))
 colnames(grants_aggregated) <- gsub("  ", " ", colnames(grants_aggregated))
@@ -163,61 +163,109 @@ knitr::kable(grants_aggregated)
 
 | Area | 2024 Spring | 2024 Fall | 2025 Spring | 2025 Fall | 2026 Spring |
 |:---|---:|---:|---:|---:|---:|
-| California | 508 | 752 | 361 | 586 | 70 |
-| New York | 371 | 475 | 256 | 371 | 37 |
-| Texas | 324 | 415 | 224 | 355 | 40 |
-| Massachusetts | 327 | 410 | 189 | 305 | 18 |
-| Pennsylvania | 243 | 282 | 165 | 233 | 26 |
-| Illinois | 218 | 277 | 122 | 224 | 14 |
-| Virginia | 161 | 227 | 89 | 139 | 14 |
-| Florida | 184 | 225 | 105 | 179 | 24 |
-| Michigan | 208 | 215 | 97 | 188 | 20 |
-| North Carolina | 153 | 210 | 103 | 181 | 21 |
-| Colorado | 111 | 183 | 73 | 146 | 9 |
-| Arizona | 101 | 177 | 65 | 99 | 12 |
-| Georgia | 137 | 171 | 78 | 147 | 11 |
-| Indiana | 130 | 166 | 83 | 157 | 13 |
-| Maryland | 118 | 147 | 79 | 129 | 21 |
-| New Jersey | 123 | 146 | 90 | 138 | 10 |
-| Washington | 97 | 144 | 68 | 106 | 7 |
-| Ohio | 110 | 134 | 73 | 106 | 12 |
-| Tennessee | 78 | 108 | 41 | 83 | 5 |
-| Alabama | 63 | 105 | 51 | 74 | 14 |
-| Wisconsin | 76 | 105 | 64 | 91 | 11 |
-| South Carolina | 60 | 102 | 31 | 66 | 12 |
-| District of Columbia | 51 | 101 | 42 | 55 | 9 |
-| Minnesota | 79 | 101 | 47 | 62 | 3 |
-| Rhode Island | 66 | 84 | 46 | 71 | 11 |
-| Oregon | 68 | 83 | 41 | 65 | 5 |
-| Iowa | 54 | 77 | 36 | 66 | 4 |
-| Louisiana | 54 | 77 | 30 | 68 | 6 |
-| Utah | 44 | 77 | 35 | 65 | 7 |
-| Missouri | 74 | 76 | 64 | 63 | 14 |
-| Connecticut | 66 | 63 | 52 | 66 | 6 |
-| New Mexico | 34 | 62 | 21 | 38 | 5 |
-| Oklahoma | 42 | 59 | 23 | 51 | 7 |
-| Kansas | 29 | 58 | 14 | 34 | 7 |
-| Nebraska | 39 | 55 | 22 | 44 | 1 |
-| Hawaii | 15 | 53 | 16 | 28 | 2 |
-| Kentucky | 36 | 51 | 28 | 40 | 1 |
-| Delaware | 18 | 47 | 31 | 37 | 4 |
-| Idaho | 16 | 43 | 16 | 31 | 2 |
-| Nevada | 12 | 43 | 11 | 31 | 1 |
-| New Hampshire | 21 | 36 | 21 | 35 | 1 |
+| California | 508 | 752 | 361 | 586 | 102 |
+| New York | 371 | 475 | 256 | 371 | 63 |
+| Texas | 324 | 415 | 224 | 355 | 64 |
+| Massachusetts | 327 | 410 | 189 | 305 | 31 |
+| Pennsylvania | 243 | 282 | 165 | 233 | 48 |
+| Illinois | 218 | 277 | 122 | 224 | 26 |
+| Virginia | 161 | 227 | 89 | 139 | 24 |
+| Florida | 184 | 225 | 105 | 179 | 42 |
+| Michigan | 208 | 215 | 97 | 188 | 26 |
+| North Carolina | 153 | 210 | 103 | 181 | 30 |
+| Colorado | 111 | 183 | 73 | 146 | 14 |
+| Arizona | 101 | 177 | 65 | 99 | 15 |
+| Georgia | 137 | 171 | 78 | 147 | 16 |
+| Indiana | 130 | 166 | 83 | 157 | 28 |
+| Maryland | 118 | 147 | 79 | 129 | 36 |
+| New Jersey | 123 | 146 | 90 | 138 | 20 |
+| Washington | 97 | 144 | 68 | 106 | 19 |
+| Ohio | 110 | 134 | 73 | 106 | 17 |
+| Tennessee | 78 | 108 | 41 | 83 | 11 |
+| Alabama | 63 | 105 | 51 | 74 | 20 |
+| Wisconsin | 76 | 105 | 64 | 91 | 18 |
+| South Carolina | 60 | 102 | 31 | 66 | 17 |
+| District of Columbia | 51 | 101 | 42 | 55 | 13 |
+| Minnesota | 79 | 101 | 47 | 62 | 9 |
+| Rhode Island | 66 | 84 | 46 | 71 | 21 |
+| Oregon | 68 | 83 | 41 | 65 | 8 |
+| Iowa | 54 | 77 | 36 | 66 | 7 |
+| Louisiana | 54 | 77 | 30 | 68 | 12 |
+| Utah | 44 | 77 | 35 | 65 | 11 |
+| Missouri | 74 | 76 | 64 | 63 | 18 |
+| Connecticut | 66 | 63 | 52 | 66 | 8 |
+| New Mexico | 34 | 62 | 21 | 38 | 10 |
+| Oklahoma | 42 | 59 | 23 | 51 | 10 |
+| Kansas | 29 | 58 | 14 | 34 | 11 |
+| Nebraska | 39 | 55 | 22 | 44 | 3 |
+| Hawaii | 15 | 53 | 16 | 28 | 7 |
+| Kentucky | 36 | 51 | 28 | 40 | 5 |
+| Delaware | 18 | 47 | 31 | 37 | 6 |
+| Idaho | 16 | 43 | 16 | 31 | 5 |
+| Nevada | 12 | 43 | 11 | 31 | 3 |
+| New Hampshire | 21 | 36 | 21 | 35 | 2 |
 | Mississippi | 38 | 35 | 19 | 35 | 3 |
-| Alaska | 10 | 32 | 4 | 19 | 0 |
+| Alaska | 10 | 32 | 4 | 19 | 2 |
 | Montana | 19 | 32 | 8 | 22 | 3 |
-| Maine | 30 | 27 | 10 | 24 | 0 |
-| Arkansas | 27 | 25 | 10 | 26 | 4 |
+| Maine | 30 | 27 | 10 | 24 | 2 |
+| Arkansas | 27 | 25 | 10 | 26 | 6 |
 | West Virginia | 28 | 25 | 8 | 26 | 1 |
 | South Dakota | 20 | 22 | 17 | 17 | 1 |
-| Vermont | 13 | 22 | 12 | 13 | 3 |
+| Vermont | 13 | 22 | 12 | 13 | 4 |
 | Puerto Rico | 7 | 20 | 9 | 14 | 0 |
-| Wyoming | 10 | 19 | 7 | 18 | 1 |
-| North Dakota | 11 | 12 | 9 | 21 | 1 |
+| Wyoming | 10 | 19 | 7 | 18 | 3 |
+| North Dakota | 11 | 12 | 9 | 21 | 3 |
 | Virgin Islands of the U.S. | 0 | 3 | 1 | 1 | 0 |
 | American Samoa | 0 | 1 | 0 | 0 | 0 |
 | Guam | 0 | 0 | 2 | 1 | 0 |
+
+## Recent info
+
+We can see when the most recent grant has been awarded (relative to when
+this package was last built) by state or territory; we can also look to
+see how funding so far this year compares to average funding at this
+point of the year for 2017-2024 (so it encompasses two different
+administrations).
+
+``` r
+library(lubridate)
+#> 
+#> Attaching package: 'lubridate'
+#> The following objects are masked from 'package:base':
+#> 
+#>     date, intersect, setdiff, union
+library(ggrepel)
+
+data(grants)
+
+current_day_of_year <- lubridate::yday(Sys.Date())
+grants_modified <- grants
+grants_modified$awardeeStateCode <- toupper(grants_modified$awardeeStateCode) # handle some early data that uses lowercase
+grants_modified$date_formatted <- as.Date(grants_modified$date, format="%m/%d/%Y")
+grants_modified <- grants_modified[!is.na(grants_modified$date_formatted),]
+grants_modified$day_of_year <- lubridate::yday(grants_modified$date_formatted)
+grants_modified$year <- as.numeric(format(grants_modified$date_formatted, "%Y"))
+grants_modified$funds <- as.numeric(grants_modified$fundsObligatedAmt)
+grants_recent <- grants_modified |> group_by(awardeeStateCode) |> summarize(most_recent = max(date_formatted), days_since_grant = Sys.Date() - max(date_formatted))
+
+grants_2026 <- subset(grants_modified, year==2026)
+grants_2017_2024 <- subset(grants_modified, year>= 2017 & year <=2024) # so we have 8 years of data across two admins
+grants_2017_2024 <- subset(grants_2017_2024, day_of_year < current_day_of_year) # so we compare similar
+grants_aggregated_2026 <- grants_2026 |> group_by(awardeeStateCode) |> summarize(funds_per_year_2026 = sum(funds)) |> arrange(awardeeStateCode) |> ungroup()
+grants_aggregated_2017_2024 <- grants_2017_2024 |> group_by(awardeeStateCode) |> summarize(funds_per_year_8 = sum(funds)/8) |> arrange(awardeeStateCode) |> ungroup()
+grants_comparison <- full_join(full_join(grants_aggregated_2017_2024, grants_aggregated_2026), grants_recent)
+#> Joining with `by = join_by(awardeeStateCode)`
+#> Joining with `by = join_by(awardeeStateCode)`
+grants_comparison$funds_per_year_2026[is.na(grants_comparison$funds_per_year_2026)] <- 0
+grants_comparison <- subset(grants_comparison, !is.na(grants_comparison$funds_per_year_8)) # rarely get funding
+grants_comparison <- subset(grants_comparison, grants_comparison$funds_per_year_8>50000) # eliminate entities which have traditionally low, rare funding as they make it hard to see the wait times for the others 
+grants_comparison$percentage_usual_funding_by_this_date <- 100*grants_comparison$funds_per_year_2026 / grants_comparison$funds_per_year_8
+grants_comparison$days_since_grant <- as.numeric(grants_comparison$days_since_grant)
+g <- ggplot(grants_comparison, aes(x=days_since_grant, y=percentage_usual_funding_by_this_date, label=awardeeStateCode)) + geom_text_repel(max.overlaps=50, alpha=0.8) + theme_minimal() + xlab("Days since most recent grant") + ylab("2026 percentage of usual funding by this date") + geom_point(alpha=0.5) + scale_x_continuous(trans='log1p', breaks=c(1, 7, 30, 90, 120, 365, 2*365), limits=c(0, NA)) 
+print(g)
+```
+
+<img src="man/figures/README-recent-1.png" alt="" width="100%" />
 
 ## GRFP data
 
@@ -290,8 +338,15 @@ First, update the package version in the DESCRIPTION.
 Then the directory containing the package source:
 
     library(rnsf)
-    grants <- nsf_update_cached()
-    usethis::use_data(grants, overwrite=TRUE)
+    grants <- nsf_update_cached_this_year() # perhaps worth doing a new nsf_get_all() after the beginning of the year
+    usethis::use_data(grants, overwrite=TRUE) 
+    devtools::install()
+
+Then quit R and reopen (so it uses the latest saved grants).
+
+Then:
+
+    library(rnsf)
     devtools::build_readme()
     pkgdown::build_site()
     system("git add */*")
