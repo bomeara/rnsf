@@ -14,13 +14,16 @@ knitr::opts_chunk$set(
   fig.width = 7,
   fig.dpi = 600
 )
+library(rnsf)
+data(grants)
+most_recent <- max(as.Date(grants$date, format="%m/%d/%Y"))
 ```
 
 # rnsf
 
 Unofficial package to interface with NSF API
 
-It also has abstracts, dates, and more information for all grants up to April 11, 2026. 
+It also has abstracts, dates, and more information for all grants up to `r most_recent`. 
 
 * Webpage with package information: <https://bomeara.github.io/rnsf/>
 * Github page: <https://github.com/bomeara/rnsf/>
