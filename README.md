@@ -6,7 +6,7 @@
 Unofficial package to interface with NSF API
 
 It also has abstracts, dates, and more information for all grants up to
-2026-05-01.
+2026-05-14.
 
 - Webpage with package information: <https://bomeara.github.io/rnsf/>
 - Github page: <https://github.com/bomeara/rnsf/>
@@ -163,55 +163,55 @@ knitr::kable(grants_aggregated)
 
 | Area | 2024 Spring | 2024 Fall | 2025 Spring | 2025 Fall | 2026 Spring |
 |:---|---:|---:|---:|---:|---:|
-| California | 508 | 752 | 361 | 586 | 120 |
-| New York | 371 | 475 | 256 | 371 | 74 |
-| Texas | 324 | 415 | 224 | 355 | 73 |
-| Massachusetts | 327 | 410 | 189 | 305 | 34 |
-| Pennsylvania | 243 | 282 | 165 | 233 | 55 |
-| Illinois | 218 | 277 | 122 | 224 | 33 |
-| Virginia | 161 | 227 | 89 | 139 | 28 |
-| Florida | 184 | 225 | 105 | 179 | 47 |
-| Michigan | 208 | 215 | 97 | 188 | 34 |
-| North Carolina | 153 | 210 | 103 | 181 | 31 |
-| Colorado | 111 | 183 | 73 | 146 | 16 |
-| Arizona | 101 | 177 | 65 | 99 | 18 |
-| Georgia | 137 | 171 | 78 | 147 | 22 |
-| Indiana | 130 | 166 | 83 | 157 | 31 |
-| Maryland | 118 | 147 | 79 | 129 | 42 |
-| New Jersey | 123 | 146 | 90 | 138 | 25 |
-| Washington | 97 | 144 | 68 | 106 | 22 |
+| California | 508 | 752 | 361 | 586 | 148 |
+| New York | 371 | 475 | 256 | 371 | 88 |
+| Texas | 324 | 415 | 224 | 355 | 84 |
+| Massachusetts | 327 | 410 | 189 | 305 | 40 |
+| Pennsylvania | 243 | 282 | 165 | 233 | 67 |
+| Illinois | 218 | 277 | 122 | 224 | 43 |
+| Virginia | 161 | 227 | 89 | 139 | 34 |
+| Florida | 184 | 225 | 105 | 179 | 54 |
+| Michigan | 208 | 215 | 97 | 188 | 40 |
+| North Carolina | 153 | 210 | 103 | 181 | 33 |
+| Colorado | 111 | 183 | 73 | 146 | 19 |
+| Arizona | 101 | 177 | 65 | 99 | 21 |
+| Georgia | 137 | 171 | 78 | 147 | 29 |
+| Indiana | 130 | 166 | 83 | 157 | 33 |
+| Maryland | 118 | 147 | 79 | 129 | 47 |
+| New Jersey | 123 | 146 | 90 | 138 | 30 |
+| Washington | 97 | 144 | 68 | 106 | 25 |
 | Ohio | 110 | 134 | 73 | 106 | 21 |
-| Tennessee | 78 | 108 | 41 | 83 | 13 |
-| Alabama | 63 | 105 | 51 | 74 | 20 |
-| Wisconsin | 76 | 105 | 64 | 91 | 19 |
-| South Carolina | 60 | 102 | 31 | 66 | 19 |
-| District of Columbia | 51 | 101 | 42 | 55 | 15 |
-| Minnesota | 79 | 101 | 47 | 62 | 11 |
-| Rhode Island | 66 | 84 | 46 | 71 | 25 |
+| Tennessee | 78 | 108 | 41 | 83 | 16 |
+| Alabama | 63 | 105 | 51 | 74 | 22 |
+| Wisconsin | 76 | 105 | 64 | 91 | 22 |
+| South Carolina | 60 | 102 | 31 | 66 | 20 |
+| District of Columbia | 51 | 101 | 42 | 55 | 17 |
+| Minnesota | 79 | 101 | 47 | 62 | 15 |
+| Rhode Island | 66 | 84 | 46 | 71 | 31 |
 | Oregon | 68 | 83 | 41 | 65 | 10 |
-| Iowa | 54 | 77 | 36 | 66 | 9 |
-| Louisiana | 54 | 77 | 30 | 68 | 14 |
-| Utah | 44 | 77 | 35 | 65 | 14 |
-| Missouri | 74 | 76 | 64 | 63 | 24 |
-| Connecticut | 66 | 63 | 52 | 66 | 10 |
-| New Mexico | 34 | 62 | 21 | 38 | 10 |
-| Oklahoma | 42 | 59 | 23 | 51 | 13 |
+| Iowa | 54 | 77 | 36 | 66 | 13 |
+| Louisiana | 54 | 77 | 30 | 68 | 16 |
+| Utah | 44 | 77 | 35 | 65 | 15 |
+| Missouri | 74 | 76 | 64 | 63 | 28 |
+| Connecticut | 66 | 63 | 52 | 66 | 13 |
+| New Mexico | 34 | 62 | 21 | 38 | 15 |
+| Oklahoma | 42 | 59 | 23 | 51 | 14 |
 | Kansas | 29 | 58 | 14 | 34 | 13 |
-| Nebraska | 39 | 55 | 22 | 44 | 7 |
+| Nebraska | 39 | 55 | 22 | 44 | 10 |
 | Hawaii | 15 | 53 | 16 | 28 | 8 |
-| Kentucky | 36 | 51 | 28 | 40 | 7 |
+| Kentucky | 36 | 51 | 28 | 40 | 8 |
 | Delaware | 18 | 47 | 31 | 37 | 6 |
 | Idaho | 16 | 43 | 16 | 31 | 5 |
-| Nevada | 12 | 43 | 11 | 31 | 3 |
+| Nevada | 12 | 43 | 11 | 31 | 6 |
 | New Hampshire | 21 | 36 | 21 | 35 | 4 |
-| Mississippi | 38 | 35 | 19 | 35 | 3 |
+| Mississippi | 38 | 35 | 19 | 35 | 5 |
 | Alaska | 10 | 32 | 4 | 19 | 2 |
 | Montana | 19 | 32 | 8 | 22 | 4 |
 | Maine | 30 | 27 | 10 | 24 | 2 |
-| Arkansas | 27 | 25 | 10 | 26 | 6 |
+| Arkansas | 27 | 25 | 10 | 26 | 8 |
 | West Virginia | 28 | 25 | 8 | 26 | 1 |
-| South Dakota | 20 | 22 | 17 | 17 | 1 |
-| Vermont | 13 | 22 | 12 | 13 | 5 |
+| South Dakota | 20 | 22 | 17 | 17 | 2 |
+| Vermont | 13 | 22 | 12 | 13 | 6 |
 | Puerto Rico | 7 | 20 | 9 | 14 | 0 |
 | Wyoming | 10 | 19 | 7 | 18 | 3 |
 | North Dakota | 11 | 12 | 9 | 21 | 5 |
