@@ -112,7 +112,7 @@ grants$estimatedTotalAmt <- as.numeric(grants$estimatedTotalAmt)
 grants <- grants |> arrange(year, dayofyear) |> group_by(year) |> mutate(estimatedTotalAmt_by_year = cumsum(estimatedTotalAmt)) |> ungroup()
 grants <- grants[!is.na(grants$year),]
 grants_recent <- subset(grants, year>=2020)
-g <- ggplot(grants_recent, aes(x=dayofyear, y=estimatedTotalAmt_by_year/1e9, colour=year)) + geom_line() + theme_minimal() + xlab("Day of year") + ylab("Cumulative billions of dollars awarded") + scale_colour_viridis_d(option="turbo", begin=0.2)
+g <- ggplot(grants_recent, aes(x=dayofyear, y=estimatedTotalAmt_by_year/1e9, colour=year)) + geom_line() + theme_minimal() + xlab("Day") + ylab("Cumulative billions of dollars awarded") + scale_colour_viridis_d(option="turbo", begin=0.2) + scale_x_date(date_breaks = "1 month", date_labels =  "%b") 
 print(g)
 ```
 
@@ -166,6 +166,37 @@ grants_comparison <- subset(grants_comparison, grants_comparison$funds_per_year_
 grants_comparison$percentage_usual_funding_by_this_date <- 100*grants_comparison$funds_per_year_2026 / grants_comparison$funds_per_year_8
 grants_comparison$days_since_grant <- as.numeric(grants_comparison$days_since_grant)
 g <- ggplot(grants_comparison, aes(x=days_since_grant, y=percentage_usual_funding_by_this_date, label=awardeeStateCode)) + geom_text_repel(max.overlaps=50, alpha=0.8) + theme_minimal() + xlab("Days since most recent grant") + ylab("2026 percentage of usual funding by this date") + geom_point(alpha=0.5) + scale_x_continuous(trans='log1p', breaks=c(1, 7, 30, 90, 120, 365, 2*365), limits=c(0, NA)) 
+print(g)
+```
+
+## Rolling window
+
+How is NSF awarding grants over time? This uses a two week rolling interval, showing the average grants awarded per day in that interval.
+
+```{r rolling}
+data(grants)
+grants_modified <- grants
+grants_modified$date_formatted <- as.Date(grants_modified$date, format="%m/%d/%Y")
+grants_modified <- grants_modified[!is.na(grants_modified$date_formatted),]
+grants_modified$year <- as.numeric(format(grants_modified$date_formatted, "%Y"))
+grants_modified <- grants_modified[order(grants_modified$date_formatted),]
+grants_modified$funding <- as.numeric(grants_modified$fundsObligatedAmt)
+
+
+min_date <- -14+as.Date("01/01/2020", format="%m/%d/%Y")
+rolling_counts <- data.frame(end_date = as.Date(min_date:Sys.Date()), count=NA, amount=NA)
+for (count_index in sequence(nrow(rolling_counts))) {
+	focal_end_date <- rolling_counts$end_date[count_index]
+	grants_focal <- subset(grants_modified, date_formatted>(focal_end_date-14) & date_formatted<=focal_end_date)
+	rolling_counts$count[count_index] <- nrow(grants_focal)
+	rolling_counts$amount[count_index] <- sum(grants_focal$funding, na.rm=TRUE)
+}
+
+rolling_counts$dayofyear <- timeDate::dayOfYear(timeDate::timeDate(rolling_counts$end_date))
+rolling_counts$year <- format(rolling_counts$end_date, "%Y")
+
+
+g <- ggplot(rolling_counts, aes(x=dayofyear, y=count/14, colour=year)) + geom_line() + theme_minimal() + xlab("End of 2 week period") + ylab("Grants awarded per day, two week rolling average") + scale_colour_viridis_d(option="turbo", begin=0.2) + scale_y_continuous(trans='log1p', breaks=c(0, 1, 5, 10, 20, 40, 80, 160)) + scale_x_date(date_breaks = "1 months", date_labels =  "%b") + geom_point(data=rolling_counts[nrow(rolling_counts),]) 
 print(g)
 ```
 

@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">rnsf</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2026.05.31.01</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2026.06.18.01</span>
       </span>
     </div>
 
@@ -60,7 +60,7 @@
 <div class="page-header"><h1 id="rnsf">rnsf<a class="anchor" aria-label="anchor" href="#rnsf"></a>
 </h1></div>
 <p>Unofficial package to interface with NSF API</p>
-<p>It also has abstracts, dates, and more information for all grants up to 2026-05-29.</p>
+<p>It also has abstracts, dates, and more information for all grants up to 2026-06-17.</p>
 <ul>
 <li>Webpage with package information: <a href="https://bomeara.github.io/rnsf/" class="external-link uri">https://bomeara.github.io/rnsf/</a>
 </li>
@@ -160,7 +160,7 @@
 <span><span class="va">grants</span> <span class="op">&lt;-</span> <span class="va">grants</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">year</span>, <span class="va">dayofyear</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">year</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>estimatedTotalAmt_by_year <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cumsum.html" class="external-link">cumsum</a></span><span class="op">(</span><span class="va">estimatedTotalAmt</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">grants</span> <span class="op">&lt;-</span> <span class="va">grants</span><span class="op">[</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">grants</span><span class="op">$</span><span class="va">year</span><span class="op">)</span>,<span class="op">]</span></span>
 <span><span class="va">grants_recent</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">grants</span>, <span class="va">year</span><span class="op">&gt;=</span><span class="fl">2020</span><span class="op">)</span></span>
-<span><span class="va">g</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">grants_recent</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">dayofyear</span>, y<span class="op">=</span><span class="va">estimatedTotalAmt_by_year</span><span class="op">/</span><span class="fl">1e9</span>, colour<span class="op">=</span><span class="va">year</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Day of year"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Cumulative billions of dollars awarded"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_colour_viridis_d</a></span><span class="op">(</span>option<span class="op">=</span><span class="st">"turbo"</span>, begin<span class="op">=</span><span class="fl">0.2</span><span class="op">)</span></span>
+<span><span class="va">g</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">grants_recent</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">dayofyear</span>, y<span class="op">=</span><span class="va">estimatedTotalAmt_by_year</span><span class="op">/</span><span class="fl">1e9</span>, colour<span class="op">=</span><span class="va">year</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Day"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Cumulative billions of dollars awarded"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_colour_viridis_d</a></span><span class="op">(</span>option<span class="op">=</span><span class="st">"turbo"</span>, begin<span class="op">=</span><span class="fl">0.2</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_date.html" class="external-link">scale_x_date</a></span><span class="op">(</span>date_breaks <span class="op">=</span> <span class="st">"1 month"</span>, date_labels <span class="op">=</span>  <span class="st">"%b"</span><span class="op">)</span> </span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-bergogram-1.png" alt="" width="100%"></p>
 </div>
@@ -204,7 +204,7 @@
 <td align="right">752</td>
 <td align="right">361</td>
 <td align="right">586</td>
-<td align="right">183</td>
+<td align="right">214</td>
 </tr>
 <tr>
 <td align="left">New York</td>
@@ -212,7 +212,7 @@
 <td align="right">475</td>
 <td align="right">256</td>
 <td align="right">371</td>
-<td align="right">114</td>
+<td align="right">123</td>
 </tr>
 <tr>
 <td align="left">Texas</td>
@@ -220,7 +220,7 @@
 <td align="right">415</td>
 <td align="right">224</td>
 <td align="right">355</td>
-<td align="right">97</td>
+<td align="right">108</td>
 </tr>
 <tr>
 <td align="left">Massachusetts</td>
@@ -228,7 +228,7 @@
 <td align="right">410</td>
 <td align="right">189</td>
 <td align="right">305</td>
-<td align="right">65</td>
+<td align="right">87</td>
 </tr>
 <tr>
 <td align="left">Pennsylvania</td>
@@ -236,7 +236,7 @@
 <td align="right">282</td>
 <td align="right">165</td>
 <td align="right">233</td>
-<td align="right">81</td>
+<td align="right">93</td>
 </tr>
 <tr>
 <td align="left">Illinois</td>
@@ -244,7 +244,7 @@
 <td align="right">277</td>
 <td align="right">122</td>
 <td align="right">224</td>
-<td align="right">59</td>
+<td align="right">61</td>
 </tr>
 <tr>
 <td align="left">Virginia</td>
@@ -252,7 +252,7 @@
 <td align="right">227</td>
 <td align="right">89</td>
 <td align="right">139</td>
-<td align="right">48</td>
+<td align="right">54</td>
 </tr>
 <tr>
 <td align="left">Florida</td>
@@ -260,7 +260,7 @@
 <td align="right">225</td>
 <td align="right">105</td>
 <td align="right">179</td>
-<td align="right">68</td>
+<td align="right">75</td>
 </tr>
 <tr>
 <td align="left">Michigan</td>
@@ -268,7 +268,7 @@
 <td align="right">215</td>
 <td align="right">97</td>
 <td align="right">188</td>
-<td align="right">48</td>
+<td align="right">52</td>
 </tr>
 <tr>
 <td align="left">North Carolina</td>
@@ -276,7 +276,7 @@
 <td align="right">210</td>
 <td align="right">103</td>
 <td align="right">181</td>
-<td align="right">52</td>
+<td align="right">56</td>
 </tr>
 <tr>
 <td align="left">Colorado</td>
@@ -284,7 +284,7 @@
 <td align="right">183</td>
 <td align="right">73</td>
 <td align="right">146</td>
-<td align="right">26</td>
+<td align="right">30</td>
 </tr>
 <tr>
 <td align="left">Arizona</td>
@@ -292,7 +292,7 @@
 <td align="right">177</td>
 <td align="right">65</td>
 <td align="right">99</td>
-<td align="right">23</td>
+<td align="right">25</td>
 </tr>
 <tr>
 <td align="left">Georgia</td>
@@ -300,7 +300,7 @@
 <td align="right">171</td>
 <td align="right">78</td>
 <td align="right">147</td>
-<td align="right">40</td>
+<td align="right">44</td>
 </tr>
 <tr>
 <td align="left">Indiana</td>
@@ -308,7 +308,7 @@
 <td align="right">166</td>
 <td align="right">83</td>
 <td align="right">157</td>
-<td align="right">41</td>
+<td align="right">48</td>
 </tr>
 <tr>
 <td align="left">Maryland</td>
@@ -316,7 +316,7 @@
 <td align="right">147</td>
 <td align="right">79</td>
 <td align="right">129</td>
-<td align="right">58</td>
+<td align="right">67</td>
 </tr>
 <tr>
 <td align="left">New Jersey</td>
@@ -324,7 +324,7 @@
 <td align="right">146</td>
 <td align="right">90</td>
 <td align="right">138</td>
-<td align="right">42</td>
+<td align="right">45</td>
 </tr>
 <tr>
 <td align="left">Washington</td>
@@ -332,7 +332,7 @@
 <td align="right">144</td>
 <td align="right">68</td>
 <td align="right">106</td>
-<td align="right">31</td>
+<td align="right">33</td>
 </tr>
 <tr>
 <td align="left">Ohio</td>
@@ -340,7 +340,7 @@
 <td align="right">134</td>
 <td align="right">73</td>
 <td align="right">106</td>
-<td align="right">27</td>
+<td align="right">32</td>
 </tr>
 <tr>
 <td align="left">Tennessee</td>
@@ -348,7 +348,7 @@
 <td align="right">108</td>
 <td align="right">41</td>
 <td align="right">83</td>
-<td align="right">26</td>
+<td align="right">28</td>
 </tr>
 <tr>
 <td align="left">Alabama</td>
@@ -356,7 +356,7 @@
 <td align="right">105</td>
 <td align="right">51</td>
 <td align="right">74</td>
-<td align="right">28</td>
+<td align="right">32</td>
 </tr>
 <tr>
 <td align="left">Wisconsin</td>
@@ -364,7 +364,7 @@
 <td align="right">105</td>
 <td align="right">64</td>
 <td align="right">91</td>
-<td align="right">29</td>
+<td align="right">33</td>
 </tr>
 <tr>
 <td align="left">South Carolina</td>
@@ -372,7 +372,7 @@
 <td align="right">102</td>
 <td align="right">31</td>
 <td align="right">66</td>
-<td align="right">23</td>
+<td align="right">25</td>
 </tr>
 <tr>
 <td align="left">District of Columbia</td>
@@ -380,7 +380,7 @@
 <td align="right">101</td>
 <td align="right">42</td>
 <td align="right">55</td>
-<td align="right">18</td>
+<td align="right">20</td>
 </tr>
 <tr>
 <td align="left">Minnesota</td>
@@ -388,7 +388,7 @@
 <td align="right">101</td>
 <td align="right">47</td>
 <td align="right">62</td>
-<td align="right">19</td>
+<td align="right">22</td>
 </tr>
 <tr>
 <td align="left">Rhode Island</td>
@@ -396,7 +396,7 @@
 <td align="right">84</td>
 <td align="right">46</td>
 <td align="right">71</td>
-<td align="right">37</td>
+<td align="right">40</td>
 </tr>
 <tr>
 <td align="left">Oregon</td>
@@ -404,7 +404,7 @@
 <td align="right">83</td>
 <td align="right">41</td>
 <td align="right">65</td>
-<td align="right">13</td>
+<td align="right">14</td>
 </tr>
 <tr>
 <td align="left">Iowa</td>
@@ -412,7 +412,7 @@
 <td align="right">77</td>
 <td align="right">36</td>
 <td align="right">66</td>
-<td align="right">14</td>
+<td align="right">16</td>
 </tr>
 <tr>
 <td align="left">Louisiana</td>
@@ -420,7 +420,7 @@
 <td align="right">77</td>
 <td align="right">30</td>
 <td align="right">68</td>
-<td align="right">25</td>
+<td align="right">28</td>
 </tr>
 <tr>
 <td align="left">Utah</td>
@@ -428,7 +428,7 @@
 <td align="right">77</td>
 <td align="right">35</td>
 <td align="right">65</td>
-<td align="right">16</td>
+<td align="right">19</td>
 </tr>
 <tr>
 <td align="left">Missouri</td>
@@ -436,7 +436,7 @@
 <td align="right">76</td>
 <td align="right">64</td>
 <td align="right">63</td>
-<td align="right">32</td>
+<td align="right">34</td>
 </tr>
 <tr>
 <td align="left">Connecticut</td>
@@ -444,7 +444,7 @@
 <td align="right">63</td>
 <td align="right">52</td>
 <td align="right">66</td>
-<td align="right">20</td>
+<td align="right">23</td>
 </tr>
 <tr>
 <td align="left">New Mexico</td>
@@ -468,7 +468,7 @@
 <td align="right">58</td>
 <td align="right">14</td>
 <td align="right">34</td>
-<td align="right">18</td>
+<td align="right">19</td>
 </tr>
 <tr>
 <td align="left">Nebraska</td>
@@ -484,7 +484,7 @@
 <td align="right">53</td>
 <td align="right">16</td>
 <td align="right">28</td>
-<td align="right">11</td>
+<td align="right">14</td>
 </tr>
 <tr>
 <td align="left">Kentucky</td>
@@ -492,7 +492,7 @@
 <td align="right">51</td>
 <td align="right">28</td>
 <td align="right">40</td>
-<td align="right">9</td>
+<td align="right">10</td>
 </tr>
 <tr>
 <td align="left">Delaware</td>
@@ -500,7 +500,7 @@
 <td align="right">47</td>
 <td align="right">31</td>
 <td align="right">37</td>
-<td align="right">7</td>
+<td align="right">9</td>
 </tr>
 <tr>
 <td align="left">Idaho</td>
@@ -508,7 +508,7 @@
 <td align="right">43</td>
 <td align="right">16</td>
 <td align="right">31</td>
-<td align="right">6</td>
+<td align="right">7</td>
 </tr>
 <tr>
 <td align="left">Nevada</td>
@@ -516,7 +516,7 @@
 <td align="right">43</td>
 <td align="right">11</td>
 <td align="right">31</td>
-<td align="right">7</td>
+<td align="right">8</td>
 </tr>
 <tr>
 <td align="left">New Hampshire</td>
@@ -524,7 +524,7 @@
 <td align="right">36</td>
 <td align="right">21</td>
 <td align="right">35</td>
-<td align="right">7</td>
+<td align="right">9</td>
 </tr>
 <tr>
 <td align="left">Mississippi</td>
@@ -532,7 +532,7 @@
 <td align="right">35</td>
 <td align="right">19</td>
 <td align="right">35</td>
-<td align="right">7</td>
+<td align="right">9</td>
 </tr>
 <tr>
 <td align="left">Alaska</td>
@@ -540,7 +540,7 @@
 <td align="right">32</td>
 <td align="right">4</td>
 <td align="right">19</td>
-<td align="right">3</td>
+<td align="right">4</td>
 </tr>
 <tr>
 <td align="left">Montana</td>
@@ -564,7 +564,7 @@
 <td align="right">25</td>
 <td align="right">10</td>
 <td align="right">26</td>
-<td align="right">11</td>
+<td align="right">13</td>
 </tr>
 <tr>
 <td align="left">West Virginia</td>
@@ -596,7 +596,7 @@
 <td align="right">20</td>
 <td align="right">9</td>
 <td align="right">14</td>
-<td align="right">1</td>
+<td align="right">2</td>
 </tr>
 <tr>
 <td align="left">Wyoming</td>
@@ -604,7 +604,7 @@
 <td align="right">19</td>
 <td align="right">7</td>
 <td align="right">18</td>
-<td align="right">3</td>
+<td align="right">4</td>
 </tr>
 <tr>
 <td align="left">North Dakota</td>
@@ -612,7 +612,7 @@
 <td align="right">12</td>
 <td align="right">9</td>
 <td align="right">21</td>
-<td align="right">5</td>
+<td align="right">6</td>
 </tr>
 <tr>
 <td align="left">Virgin Islands of the U.S.</td>
@@ -684,14 +684,49 @@
 <p><img src="reference/figures/README-recent-1.png" alt="" width="100%"></p>
 </div>
 <div class="section level2">
+<h2 id="rolling-window">Rolling window<a class="anchor" aria-label="anchor" href="#rolling-window"></a>
+</h2>
+<p>How is NSF awarding grants over time? This uses a two week rolling interval, showing the average grants awarded per day in that interval.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">grants</span><span class="op">)</span></span>
+<span><span class="va">grants_modified</span> <span class="op">&lt;-</span> <span class="va">grants</span></span>
+<span><span class="va">grants_modified</span><span class="op">$</span><span class="va">date_formatted</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="va">grants_modified</span><span class="op">$</span><span class="va">date</span>, format<span class="op">=</span><span class="st">"%m/%d/%Y"</span><span class="op">)</span></span>
+<span><span class="va">grants_modified</span> <span class="op">&lt;-</span> <span class="va">grants_modified</span><span class="op">[</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">grants_modified</span><span class="op">$</span><span class="va">date_formatted</span><span class="op">)</span>,<span class="op">]</span></span>
+<span><span class="va">grants_modified</span><span class="op">$</span><span class="va">year</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/format.html" class="external-link">format</a></span><span class="op">(</span><span class="va">grants_modified</span><span class="op">$</span><span class="va">date_formatted</span>, <span class="st">"%Y"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">grants_modified</span> <span class="op">&lt;-</span> <span class="va">grants_modified</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">grants_modified</span><span class="op">$</span><span class="va">date_formatted</span><span class="op">)</span>,<span class="op">]</span></span>
+<span><span class="va">grants_modified</span><span class="op">$</span><span class="va">funding</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">grants_modified</span><span class="op">$</span><span class="va">fundsObligatedAmt</span><span class="op">)</span></span>
+<span></span>
+<span></span>
+<span><span class="va">min_date</span> <span class="op">&lt;-</span> <span class="op">-</span><span class="fl">14</span><span class="op">+</span><span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"01/01/2020"</span>, format<span class="op">=</span><span class="st">"%m/%d/%Y"</span><span class="op">)</span></span>
+<span><span class="va">rolling_counts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>end_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="va">min_date</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, count<span class="op">=</span><span class="cn">NA</span>, amount<span class="op">=</span><span class="cn">NA</span><span class="op">)</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">count_index</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/sequence.html" class="external-link">sequence</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">rolling_counts</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">focal_end_date</span> <span class="op">&lt;-</span> <span class="va">rolling_counts</span><span class="op">$</span><span class="va">end_date</span><span class="op">[</span><span class="va">count_index</span><span class="op">]</span></span>
+<span>    <span class="va">grants_focal</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">grants_modified</span>, <span class="va">date_formatted</span><span class="op">&gt;</span><span class="op">(</span><span class="va">focal_end_date</span><span class="op">-</span><span class="fl">14</span><span class="op">)</span> <span class="op">&amp;</span> <span class="va">date_formatted</span><span class="op">&lt;=</span><span class="va">focal_end_date</span><span class="op">)</span></span>
+<span>    <span class="va">rolling_counts</span><span class="op">$</span><span class="va">count</span><span class="op">[</span><span class="va">count_index</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">grants_focal</span><span class="op">)</span></span>
+<span>    <span class="va">rolling_counts</span><span class="op">$</span><span class="va">amount</span><span class="op">[</span><span class="va">count_index</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">grants_focal</span><span class="op">$</span><span class="va">funding</span>, na.rm<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">rolling_counts</span><span class="op">$</span><span class="va">dayofyear</span> <span class="op">&lt;-</span> <span class="fu">timeDate</span><span class="fu">::</span><span class="fu"><a href="https://geobosh.github.io/timeDateDoc/reference/calendar-dayOfYear.html" class="external-link">dayOfYear</a></span><span class="op">(</span><span class="fu">timeDate</span><span class="fu">::</span><span class="fu"><a href="https://geobosh.github.io/timeDateDoc/reference/timeDate.html" class="external-link">timeDate</a></span><span class="op">(</span><span class="va">rolling_counts</span><span class="op">$</span><span class="va">end_date</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">rolling_counts</span><span class="op">$</span><span class="va">year</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/format.html" class="external-link">format</a></span><span class="op">(</span><span class="va">rolling_counts</span><span class="op">$</span><span class="va">end_date</span>, <span class="st">"%Y"</span><span class="op">)</span></span>
+<span></span>
+<span></span>
+<span><span class="va">g</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">rolling_counts</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">dayofyear</span>, y<span class="op">=</span><span class="va">count</span><span class="op">/</span><span class="fl">14</span>, colour<span class="op">=</span><span class="va">year</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"End of 2 week period"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Grants awarded per day, two week rolling average"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_colour_viridis_d</a></span><span class="op">(</span>option<span class="op">=</span><span class="st">"turbo"</span>, begin<span class="op">=</span><span class="fl">0.2</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_y_continuous</a></span><span class="op">(</span>trans<span class="op">=</span><span class="st">'log1p'</span>, breaks<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">5</span>, <span class="fl">10</span>, <span class="fl">20</span>, <span class="fl">40</span>, <span class="fl">80</span>, <span class="fl">160</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_date.html" class="external-link">scale_x_date</a></span><span class="op">(</span>date_breaks <span class="op">=</span> <span class="st">"1 months"</span>, date_labels <span class="op">=</span>  <span class="st">"%b"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">rolling_counts</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">rolling_counts</span><span class="op">)</span>,<span class="op">]</span><span class="op">)</span> </span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in scale_x_date(date_breaks = "1 months", date_labels = "%b"): A &lt;numeric&gt; value was passed to a Date scale.</span></span>
+<span><span class="co">#&gt; ℹ The value was converted to a &lt;Date&gt; object.</span></span>
+<span><span class="co">#&gt; A &lt;numeric&gt; value was passed to a Date scale.</span></span>
+<span><span class="co">#&gt; ℹ The value was converted to a &lt;Date&gt; object.</span></span></code></pre></div>
+<p><img src="reference/figures/README-rolling-1.png" alt="" width="100%"></p>
+</div>
+<div class="section level2">
 <h2 id="grfp-data">GRFP data<a class="anchor" aria-label="anchor" href="#grfp-data"></a>
 </h2>
 <p>The <a href="https://www.nsfgrfp.org" class="external-link">NSF Graduate Research Fellowship Program</a> (GRFP) is one of NSF’s oldest and most impactful programs: it provides funding for three years of study for people in grad school, giving them flexibility (no need for a research or teaching assistantship); the stipends are also often higher than those for most grad students. Every year, names, affiliations, and research areas of awardees (those receiving the money) and those with honorable mentions are released <a href="https://www.research.gov/grfp/AwardeeList.do?method=loadAwardeeList" class="external-link">here</a> but you can only get one year at a time. I have manually downloaded them all and incorporated them into the package. To use:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">rnsf</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">grfp</span><span class="op">)</span></span></code></pre></div>
 <p>You can then plot information or do other analyses. For example, the number of awards in Mathematical Sciences over time:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">grfp_math</span> <span class="op">&lt;-</span> <span class="va">grfp</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Mathematical Sciences"</span>, <span class="va">grfp</span><span class="op">$</span><span class="va">Field.of.Study</span><span class="op">)</span>,<span class="op">]</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">award_level</span><span class="op">==</span><span class="st">"Awardee"</span><span class="op">)</span></span>
 <span><span class="va">grfp_math</span><span class="op">$</span><span class="va">year</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">grfp_math</span><span class="op">$</span><span class="va">year</span><span class="op">)</span></span>
 <span><span class="va">grfp_math_by_year</span> <span class="op">&lt;-</span> <span class="va">grfp_math</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">year</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>count<span class="op">=</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -699,7 +734,7 @@
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-grfpplot-1.png" alt="" width="100%"></p>
 <p>And the frequency of different subfields of math, showing just the first twenty from the past ten years of awards:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://stringr.tidyverse.org" class="external-link">stringr</a></span><span class="op">)</span></span>
 <span><span class="va">subfields</span> <span class="op">&lt;-</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/case.html" class="external-link">str_to_title</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span><span class="st">"Mathematical Sciences - "</span>, <span class="st">""</span>, <span class="va">grfp_math</span><span class="op">$</span><span class="va">Field.of.Study</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">popularity</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">subfields</span><span class="op">)</span>, decreasing<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
@@ -793,22 +828,22 @@
 </h1>
 <p>First, update the package version in the DESCRIPTION.</p>
 <p>Then the directory containing the package source:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="fu">library</span>(rnsf)</span>
-<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>grants <span class="ot">&lt;-</span> <span class="fu">nsf_update_cached_this_year</span>() <span class="co"># perhaps worth doing a new nsf_get_all() after the beginning of the year</span></span>
-<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_data</span>(grants, <span class="at">overwrite=</span><span class="cn">TRUE</span>) </span>
-<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="fu">library</span>(rnsf)</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>grants <span class="ot">&lt;-</span> <span class="fu">nsf_update_cached_this_year</span>() <span class="co"># perhaps worth doing a new nsf_get_all() after the beginning of the year</span></span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_data</span>(grants, <span class="at">overwrite=</span><span class="cn">TRUE</span>) </span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install</span>()</span></code></pre></div>
 <p>Then quit R and reopen (so it uses the latest saved grants).</p>
 <p>Then:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="fu">library</span>(rnsf)</span>
-<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">build_readme</span>()</span>
-<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>pkgdown<span class="sc">::</span><span class="fu">build_site</span>()</span>
-<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="fu">system</span>(<span class="st">"git add */*"</span>)</span>
-<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="fu">system</span>(<span class="st">"git commit -m'automatic update of page and data' -a"</span>)</span>
-<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="fu">system</span>(<span class="st">"git push"</span>)</span></code></pre></div>
-<p>If new GRFP results are out, download them, retitle them as Awardee or HonorableMention with year and .tsv (i.e., “Awardee2030.tsv”) and put them in the inst/extdata directory in the package source. Reinstall the package. Then,</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="fu">library</span>(rnsf)</span>
-<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>grfp <span class="ot">&lt;-</span> <span class="fu">compile_grfp</span>()</span>
-<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_data</span>(grfp, <span class="at">overwrite=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">build_readme</span>()</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>pkgdown<span class="sc">::</span><span class="fu">build_site</span>()</span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a><span class="fu">system</span>(<span class="st">"git add */*"</span>)</span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a><span class="fu">system</span>(<span class="st">"git commit -m'automatic update of page and data' -a"</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a><span class="fu">system</span>(<span class="st">"git push"</span>)</span></code></pre></div>
+<p>If new GRFP results are out, download them, retitle them as Awardee or HonorableMention with year and .tsv (i.e., “Awardee2030.tsv”) and put them in the inst/extdata directory in the package source. Reinstall the package. Then,</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="fu">library</span>(rnsf)</span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>grfp <span class="ot">&lt;-</span> <span class="fu">compile_grfp</span>()</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">use_data</span>(grfp, <span class="at">overwrite=</span><span class="cn">TRUE</span>)</span></code></pre></div>
 <p>Then do the usual git things.</p>
 </div>
 

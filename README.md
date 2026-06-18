@@ -6,7 +6,7 @@
 Unofficial package to interface with NSF API
 
 It also has abstracts, dates, and more information for all grants up to
-2026-05-29.
+2026-06-17.
 
 - Webpage with package information: <https://bomeara.github.io/rnsf/>
 - Github page: <https://github.com/bomeara/rnsf/>
@@ -135,7 +135,7 @@ grants$estimatedTotalAmt <- as.numeric(grants$estimatedTotalAmt)
 grants <- grants |> arrange(year, dayofyear) |> group_by(year) |> mutate(estimatedTotalAmt_by_year = cumsum(estimatedTotalAmt)) |> ungroup()
 grants <- grants[!is.na(grants$year),]
 grants_recent <- subset(grants, year>=2020)
-g <- ggplot(grants_recent, aes(x=dayofyear, y=estimatedTotalAmt_by_year/1e9, colour=year)) + geom_line() + theme_minimal() + xlab("Day of year") + ylab("Cumulative billions of dollars awarded") + scale_colour_viridis_d(option="turbo", begin=0.2)
+g <- ggplot(grants_recent, aes(x=dayofyear, y=estimatedTotalAmt_by_year/1e9, colour=year)) + geom_line() + theme_minimal() + xlab("Day") + ylab("Cumulative billions of dollars awarded") + scale_colour_viridis_d(option="turbo", begin=0.2) + scale_x_date(date_breaks = "1 month", date_labels =  "%b") 
 print(g)
 ```
 
@@ -163,58 +163,58 @@ knitr::kable(grants_aggregated)
 
 | Area | 2024 Spring | 2024 Fall | 2025 Spring | 2025 Fall | 2026 Spring |
 |:---|---:|---:|---:|---:|---:|
-| California | 508 | 752 | 361 | 586 | 183 |
-| New York | 371 | 475 | 256 | 371 | 114 |
-| Texas | 324 | 415 | 224 | 355 | 97 |
-| Massachusetts | 327 | 410 | 189 | 305 | 65 |
-| Pennsylvania | 243 | 282 | 165 | 233 | 81 |
-| Illinois | 218 | 277 | 122 | 224 | 59 |
-| Virginia | 161 | 227 | 89 | 139 | 48 |
-| Florida | 184 | 225 | 105 | 179 | 68 |
-| Michigan | 208 | 215 | 97 | 188 | 48 |
-| North Carolina | 153 | 210 | 103 | 181 | 52 |
-| Colorado | 111 | 183 | 73 | 146 | 26 |
-| Arizona | 101 | 177 | 65 | 99 | 23 |
-| Georgia | 137 | 171 | 78 | 147 | 40 |
-| Indiana | 130 | 166 | 83 | 157 | 41 |
-| Maryland | 118 | 147 | 79 | 129 | 58 |
-| New Jersey | 123 | 146 | 90 | 138 | 42 |
-| Washington | 97 | 144 | 68 | 106 | 31 |
-| Ohio | 110 | 134 | 73 | 106 | 27 |
-| Tennessee | 78 | 108 | 41 | 83 | 26 |
-| Alabama | 63 | 105 | 51 | 74 | 28 |
-| Wisconsin | 76 | 105 | 64 | 91 | 29 |
-| South Carolina | 60 | 102 | 31 | 66 | 23 |
-| District of Columbia | 51 | 101 | 42 | 55 | 18 |
-| Minnesota | 79 | 101 | 47 | 62 | 19 |
-| Rhode Island | 66 | 84 | 46 | 71 | 37 |
-| Oregon | 68 | 83 | 41 | 65 | 13 |
-| Iowa | 54 | 77 | 36 | 66 | 14 |
-| Louisiana | 54 | 77 | 30 | 68 | 25 |
-| Utah | 44 | 77 | 35 | 65 | 16 |
-| Missouri | 74 | 76 | 64 | 63 | 32 |
-| Connecticut | 66 | 63 | 52 | 66 | 20 |
+| California | 508 | 752 | 361 | 586 | 214 |
+| New York | 371 | 475 | 256 | 371 | 123 |
+| Texas | 324 | 415 | 224 | 355 | 108 |
+| Massachusetts | 327 | 410 | 189 | 305 | 87 |
+| Pennsylvania | 243 | 282 | 165 | 233 | 93 |
+| Illinois | 218 | 277 | 122 | 224 | 61 |
+| Virginia | 161 | 227 | 89 | 139 | 54 |
+| Florida | 184 | 225 | 105 | 179 | 75 |
+| Michigan | 208 | 215 | 97 | 188 | 52 |
+| North Carolina | 153 | 210 | 103 | 181 | 56 |
+| Colorado | 111 | 183 | 73 | 146 | 30 |
+| Arizona | 101 | 177 | 65 | 99 | 25 |
+| Georgia | 137 | 171 | 78 | 147 | 44 |
+| Indiana | 130 | 166 | 83 | 157 | 48 |
+| Maryland | 118 | 147 | 79 | 129 | 67 |
+| New Jersey | 123 | 146 | 90 | 138 | 45 |
+| Washington | 97 | 144 | 68 | 106 | 33 |
+| Ohio | 110 | 134 | 73 | 106 | 32 |
+| Tennessee | 78 | 108 | 41 | 83 | 28 |
+| Alabama | 63 | 105 | 51 | 74 | 32 |
+| Wisconsin | 76 | 105 | 64 | 91 | 33 |
+| South Carolina | 60 | 102 | 31 | 66 | 25 |
+| District of Columbia | 51 | 101 | 42 | 55 | 20 |
+| Minnesota | 79 | 101 | 47 | 62 | 22 |
+| Rhode Island | 66 | 84 | 46 | 71 | 40 |
+| Oregon | 68 | 83 | 41 | 65 | 14 |
+| Iowa | 54 | 77 | 36 | 66 | 16 |
+| Louisiana | 54 | 77 | 30 | 68 | 28 |
+| Utah | 44 | 77 | 35 | 65 | 19 |
+| Missouri | 74 | 76 | 64 | 63 | 34 |
+| Connecticut | 66 | 63 | 52 | 66 | 23 |
 | New Mexico | 34 | 62 | 21 | 38 | 17 |
 | Oklahoma | 42 | 59 | 23 | 51 | 17 |
-| Kansas | 29 | 58 | 14 | 34 | 18 |
+| Kansas | 29 | 58 | 14 | 34 | 19 |
 | Nebraska | 39 | 55 | 22 | 44 | 11 |
-| Hawaii | 15 | 53 | 16 | 28 | 11 |
-| Kentucky | 36 | 51 | 28 | 40 | 9 |
-| Delaware | 18 | 47 | 31 | 37 | 7 |
-| Idaho | 16 | 43 | 16 | 31 | 6 |
-| Nevada | 12 | 43 | 11 | 31 | 7 |
-| New Hampshire | 21 | 36 | 21 | 35 | 7 |
-| Mississippi | 38 | 35 | 19 | 35 | 7 |
-| Alaska | 10 | 32 | 4 | 19 | 3 |
+| Hawaii | 15 | 53 | 16 | 28 | 14 |
+| Kentucky | 36 | 51 | 28 | 40 | 10 |
+| Delaware | 18 | 47 | 31 | 37 | 9 |
+| Idaho | 16 | 43 | 16 | 31 | 7 |
+| Nevada | 12 | 43 | 11 | 31 | 8 |
+| New Hampshire | 21 | 36 | 21 | 35 | 9 |
+| Mississippi | 38 | 35 | 19 | 35 | 9 |
+| Alaska | 10 | 32 | 4 | 19 | 4 |
 | Montana | 19 | 32 | 8 | 22 | 4 |
 | Maine | 30 | 27 | 10 | 24 | 4 |
-| Arkansas | 27 | 25 | 10 | 26 | 11 |
+| Arkansas | 27 | 25 | 10 | 26 | 13 |
 | West Virginia | 28 | 25 | 8 | 26 | 4 |
 | South Dakota | 20 | 22 | 17 | 17 | 3 |
 | Vermont | 13 | 22 | 12 | 13 | 6 |
-| Puerto Rico | 7 | 20 | 9 | 14 | 1 |
-| Wyoming | 10 | 19 | 7 | 18 | 3 |
-| North Dakota | 11 | 12 | 9 | 21 | 5 |
+| Puerto Rico | 7 | 20 | 9 | 14 | 2 |
+| Wyoming | 10 | 19 | 7 | 18 | 4 |
+| North Dakota | 11 | 12 | 9 | 21 | 6 |
 | Virgin Islands of the U.S. | 0 | 3 | 1 | 1 | 0 |
 | American Samoa | 0 | 1 | 0 | 0 | 0 |
 | Guam | 0 | 0 | 2 | 1 | 0 |
@@ -266,6 +266,44 @@ print(g)
 ```
 
 <img src="man/figures/README-recent-1.png" alt="" width="100%" />
+
+## Rolling window
+
+How is NSF awarding grants over time? This uses a two week rolling
+interval, showing the average grants awarded per day in that interval.
+
+``` r
+data(grants)
+grants_modified <- grants
+grants_modified$date_formatted <- as.Date(grants_modified$date, format="%m/%d/%Y")
+grants_modified <- grants_modified[!is.na(grants_modified$date_formatted),]
+grants_modified$year <- as.numeric(format(grants_modified$date_formatted, "%Y"))
+grants_modified <- grants_modified[order(grants_modified$date_formatted),]
+grants_modified$funding <- as.numeric(grants_modified$fundsObligatedAmt)
+
+
+min_date <- -14+as.Date("01/01/2020", format="%m/%d/%Y")
+rolling_counts <- data.frame(end_date = as.Date(min_date:Sys.Date()), count=NA, amount=NA)
+for (count_index in sequence(nrow(rolling_counts))) {
+    focal_end_date <- rolling_counts$end_date[count_index]
+    grants_focal <- subset(grants_modified, date_formatted>(focal_end_date-14) & date_formatted<=focal_end_date)
+    rolling_counts$count[count_index] <- nrow(grants_focal)
+    rolling_counts$amount[count_index] <- sum(grants_focal$funding, na.rm=TRUE)
+}
+
+rolling_counts$dayofyear <- timeDate::dayOfYear(timeDate::timeDate(rolling_counts$end_date))
+rolling_counts$year <- format(rolling_counts$end_date, "%Y")
+
+
+g <- ggplot(rolling_counts, aes(x=dayofyear, y=count/14, colour=year)) + geom_line() + theme_minimal() + xlab("End of 2 week period") + ylab("Grants awarded per day, two week rolling average") + scale_colour_viridis_d(option="turbo", begin=0.2) + scale_y_continuous(trans='log1p', breaks=c(0, 1, 5, 10, 20, 40, 80, 160)) + scale_x_date(date_breaks = "1 months", date_labels =  "%b") + geom_point(data=rolling_counts[nrow(rolling_counts),]) 
+print(g)
+#> Warning in scale_x_date(date_breaks = "1 months", date_labels = "%b"): A <numeric> value was passed to a Date scale.
+#> ℹ The value was converted to a <Date> object.
+#> A <numeric> value was passed to a Date scale.
+#> ℹ The value was converted to a <Date> object.
+```
+
+<img src="man/figures/README-rolling-1.png" alt="" width="100%" />
 
 ## GRFP data
 
