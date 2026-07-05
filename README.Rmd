@@ -195,8 +195,19 @@ for (count_index in sequence(nrow(rolling_counts))) {
 rolling_counts$dayofyear <- timeDate::dayOfYear(timeDate::timeDate(rolling_counts$end_date))
 rolling_counts$year <- format(rolling_counts$end_date, "%Y")
 
+# create a color vector: shades of gray for all but the last two years, which are blue and red
+years <- sort(unique(rolling_counts$year))
+n_years <- length(years)
+if (n_years >= 2) {
+  n_gray <- max(0, n_years - 2)
+  gray_vals <- if (n_gray>0) gray.colors(n_gray, start=0.85, end=0.4) else character(0)
+  cols <- c(gray_vals, "blue", "red")
+} else {
+  cols <- if (n_years==1) "blue" else character(0)
+}
+names(cols) <- years
 
-g <- ggplot(rolling_counts, aes(x=dayofyear, y=count/14, colour=year)) + geom_line() + theme_minimal() + xlab("End of 2 week period") + ylab("Grants awarded per day, two week rolling average") + scale_colour_viridis_d(option="turbo", begin=0.2) + scale_y_continuous(trans='log1p', breaks=c(0, 1, 5, 10, 20, 40, 80, 160)) + scale_x_date(date_breaks = "1 months", date_labels =  "%b") + geom_point(data=rolling_counts[nrow(rolling_counts),]) 
+g <- ggplot(rolling_counts, aes(x=dayofyear, y=count/14, colour=year)) + geom_line() + theme_minimal() + xlab("End of 2 week period") + ylab("Grants awarded per day, two week rolling average") + scale_colour_manual(values=cols) + scale_y_continuous(trans='log1p', breaks=c(0, 1, 5, 10, 20, 40, 80, 160)) + scale_x_date(date_breaks = "1 months", date_labels =  "%b") + geom_point(data=rolling_counts[nrow(rolling_counts),]) 
 print(g)
 ```
 
@@ -250,7 +261,7 @@ library(rnsf)
 devtools::build_readme()
 pkgdown::build_site()
 system("git add */*")
-system("git commit -m'automatic update of page and data' -a")
+system("git commit -m'automatic update of page and data' -a --no-verify") # ignore the readme warning
 system("git push")
 ```
 
