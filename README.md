@@ -6,7 +6,7 @@
 Unofficial package to interface with NSF API
 
 It also has abstracts, dates, and more information for all grants up to
-2026-07-22.
+2026-08-01.
 
 - Webpage with package information: <https://bomeara.github.io/rnsf/>
 - Github page: <https://github.com/bomeara/rnsf/>
@@ -163,58 +163,58 @@ knitr::kable(grants_aggregated)
 
 | Area | 2024 Spring | 2024 Fall | 2025 Spring | 2025 Fall | 2026 Spring | 2026 Fall |
 |:---|---:|---:|---:|---:|---:|---:|
-| California | 508 | 752 | 361 | 586 | 278 | 105 |
-| New York | 371 | 475 | 256 | 371 | 160 | 85 |
-| Texas | 324 | 415 | 224 | 355 | 138 | 75 |
-| Massachusetts | 327 | 410 | 189 | 305 | 130 | 58 |
-| Pennsylvania | 243 | 282 | 165 | 233 | 117 | 50 |
-| Illinois | 218 | 277 | 122 | 224 | 81 | 32 |
-| Virginia | 161 | 227 | 89 | 139 | 68 | 43 |
-| Florida | 184 | 225 | 105 | 179 | 102 | 37 |
-| Michigan | 208 | 215 | 97 | 188 | 77 | 31 |
-| North Carolina | 153 | 210 | 103 | 181 | 73 | 30 |
-| Colorado | 111 | 183 | 73 | 146 | 47 | 29 |
-| Arizona | 101 | 177 | 65 | 99 | 36 | 20 |
-| Georgia | 137 | 171 | 78 | 147 | 58 | 19 |
-| Indiana | 130 | 166 | 83 | 157 | 60 | 25 |
-| Maryland | 118 | 147 | 79 | 129 | 80 | 19 |
-| New Jersey | 123 | 146 | 90 | 138 | 62 | 17 |
-| Washington | 97 | 144 | 68 | 106 | 43 | 15 |
-| Ohio | 110 | 134 | 73 | 106 | 49 | 30 |
-| Tennessee | 78 | 108 | 41 | 83 | 35 | 14 |
-| Alabama | 63 | 105 | 51 | 74 | 36 | 22 |
-| Wisconsin | 76 | 105 | 64 | 91 | 45 | 20 |
-| South Carolina | 60 | 102 | 31 | 66 | 31 | 21 |
-| District of Columbia | 51 | 101 | 42 | 55 | 31 | 11 |
-| Minnesota | 79 | 101 | 47 | 62 | 26 | 8 |
-| Rhode Island | 66 | 84 | 46 | 71 | 47 | 24 |
-| Oregon | 68 | 83 | 41 | 65 | 26 | 18 |
-| Iowa | 54 | 77 | 36 | 66 | 23 | 22 |
-| Louisiana | 54 | 77 | 30 | 68 | 32 | 11 |
-| Utah | 44 | 77 | 35 | 65 | 25 | 11 |
-| Missouri | 74 | 76 | 64 | 63 | 41 | 20 |
-| Connecticut | 66 | 63 | 52 | 66 | 31 | 13 |
-| New Mexico | 34 | 62 | 21 | 38 | 20 | 13 |
-| Oklahoma | 42 | 59 | 23 | 51 | 25 | 12 |
-| Kansas | 29 | 58 | 14 | 34 | 23 | 13 |
-| Nebraska | 39 | 55 | 22 | 44 | 14 | 10 |
-| Hawaii | 15 | 53 | 16 | 28 | 15 | 7 |
-| Kentucky | 36 | 51 | 28 | 40 | 15 | 10 |
-| Delaware | 18 | 47 | 31 | 37 | 18 | 11 |
-| Idaho | 16 | 43 | 16 | 31 | 14 | 9 |
-| Nevada | 12 | 43 | 11 | 31 | 10 | 6 |
-| New Hampshire | 21 | 36 | 21 | 35 | 12 | 10 |
-| Mississippi | 38 | 35 | 19 | 35 | 11 | 3 |
-| Alaska | 10 | 32 | 4 | 19 | 5 | 6 |
-| Montana | 19 | 32 | 8 | 22 | 8 | 6 |
-| Maine | 30 | 27 | 10 | 24 | 5 | 2 |
-| Arkansas | 27 | 25 | 10 | 26 | 14 | 6 |
-| West Virginia | 28 | 25 | 8 | 26 | 5 | 3 |
-| South Dakota | 20 | 22 | 17 | 17 | 4 | 2 |
-| Vermont | 13 | 22 | 12 | 13 | 6 | 2 |
-| Puerto Rico | 7 | 20 | 9 | 14 | 3 | 2 |
-| Wyoming | 10 | 19 | 7 | 18 | 5 | 1 |
-| North Dakota | 11 | 12 | 9 | 21 | 9 | 2 |
+| California | 508 | 752 | 361 | 586 | 275 | 226 |
+| New York | 371 | 475 | 256 | 371 | 152 | 168 |
+| Texas | 324 | 415 | 224 | 355 | 142 | 137 |
+| Massachusetts | 327 | 410 | 189 | 305 | 125 | 111 |
+| Pennsylvania | 243 | 282 | 165 | 233 | 116 | 96 |
+| Illinois | 218 | 277 | 122 | 224 | 81 | 65 |
+| Virginia | 161 | 227 | 89 | 139 | 68 | 67 |
+| Florida | 184 | 225 | 105 | 179 | 102 | 65 |
+| Michigan | 208 | 215 | 97 | 188 | 76 | 57 |
+| North Carolina | 153 | 210 | 103 | 181 | 72 | 57 |
+| Colorado | 111 | 183 | 73 | 146 | 45 | 55 |
+| Arizona | 101 | 177 | 65 | 99 | 37 | 48 |
+| Georgia | 137 | 171 | 78 | 147 | 57 | 44 |
+| Indiana | 130 | 166 | 83 | 157 | 59 | 48 |
+| Maryland | 118 | 147 | 79 | 129 | 80 | 43 |
+| New Jersey | 123 | 146 | 90 | 138 | 63 | 36 |
+| Washington | 97 | 144 | 68 | 106 | 42 | 43 |
+| Ohio | 110 | 134 | 73 | 106 | 50 | 43 |
+| Tennessee | 78 | 108 | 41 | 83 | 35 | 26 |
+| Alabama | 63 | 105 | 51 | 74 | 36 | 40 |
+| Wisconsin | 76 | 105 | 64 | 91 | 45 | 37 |
+| South Carolina | 60 | 102 | 31 | 66 | 31 | 35 |
+| District of Columbia | 51 | 101 | 42 | 55 | 31 | 19 |
+| Minnesota | 79 | 101 | 47 | 62 | 26 | 20 |
+| Rhode Island | 66 | 84 | 46 | 71 | 47 | 46 |
+| Oregon | 68 | 83 | 41 | 65 | 27 | 24 |
+| Iowa | 54 | 77 | 36 | 66 | 22 | 34 |
+| Louisiana | 54 | 77 | 30 | 68 | 33 | 26 |
+| Utah | 44 | 77 | 35 | 65 | 25 | 19 |
+| Missouri | 74 | 76 | 64 | 63 | 41 | 33 |
+| Connecticut | 66 | 63 | 52 | 66 | 32 | 22 |
+| New Mexico | 34 | 62 | 21 | 38 | 21 | 23 |
+| Oklahoma | 42 | 59 | 23 | 51 | 26 | 20 |
+| Kansas | 29 | 58 | 14 | 34 | 23 | 20 |
+| Nebraska | 39 | 55 | 22 | 44 | 13 | 20 |
+| Hawaii | 15 | 53 | 16 | 28 | 14 | 13 |
+| Kentucky | 36 | 51 | 28 | 40 | 16 | 20 |
+| Delaware | 18 | 47 | 31 | 37 | 18 | 19 |
+| Idaho | 16 | 43 | 16 | 31 | 13 | 14 |
+| Nevada | 12 | 43 | 11 | 31 | 9 | 16 |
+| New Hampshire | 21 | 36 | 21 | 35 | 11 | 17 |
+| Mississippi | 38 | 35 | 19 | 35 | 11 | 9 |
+| Alaska | 10 | 32 | 4 | 19 | 5 | 16 |
+| Montana | 19 | 32 | 8 | 22 | 8 | 12 |
+| Maine | 30 | 27 | 10 | 24 | 5 | 5 |
+| Arkansas | 27 | 25 | 10 | 26 | 14 | 7 |
+| West Virginia | 28 | 25 | 8 | 26 | 5 | 5 |
+| South Dakota | 20 | 22 | 17 | 17 | 4 | 8 |
+| Vermont | 13 | 22 | 12 | 13 | 6 | 4 |
+| Puerto Rico | 7 | 20 | 9 | 14 | 3 | 7 |
+| Wyoming | 10 | 19 | 7 | 18 | 5 | 3 |
+| North Dakota | 11 | 12 | 9 | 21 | 9 | 8 |
 | Virgin Islands of the U.S. | 0 | 3 | 1 | 1 | 0 | 0 |
 | American Samoa | 0 | 1 | 0 | 0 | 0 | 0 |
 | Guam | 0 | 0 | 2 | 1 | 0 | 0 |
