@@ -211,6 +211,13 @@ g <- ggplot(rolling_counts, aes(x=dayofyear, y=count/14, colour=year)) + geom_li
 print(g)
 ```
 
+And rolling window not on a log scale:
+
+```{r rolling_no_log}
+g <- ggplot(rolling_counts, aes(x=dayofyear, y=count/14, colour=year)) + geom_line() + theme_minimal() + xlab("End of 2 week period") + ylab("Grants awarded per day, two week rolling average") + scale_colour_manual(values=cols) + scale_x_date(date_breaks = "1 months", date_labels =  "%b") + geom_point(data=rolling_counts[nrow(rolling_counts),]) 
+print(g)
+```
+
 ## GRFP data
 
 The [NSF Graduate Research Fellowship Program](https://www.nsfgrfp.org) (GRFP) is one of NSF's oldest and most impactful programs: it provides funding for three years of study for people in grad school, giving them flexibility (no need for a research or teaching assistantship); the stipends are also often higher than those for most grad students. Every year, names, affiliations, and research areas of awardees (those receiving the money) and those with honorable mentions are released [here](https://www.research.gov/grfp/AwardeeList.do?method=loadAwardeeList) but you can only get one year at a time. I have manually downloaded them all and incorporated them into the package. To use:

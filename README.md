@@ -316,6 +316,19 @@ print(g)
 
 <img src="man/figures/README-rolling-1.png" alt="" width="100%" />
 
+And rolling window not on a log scale:
+
+``` r
+g <- ggplot(rolling_counts, aes(x=dayofyear, y=count/14, colour=year)) + geom_line() + theme_minimal() + xlab("End of 2 week period") + ylab("Grants awarded per day, two week rolling average") + scale_colour_manual(values=cols) + scale_x_date(date_breaks = "1 months", date_labels =  "%b") + geom_point(data=rolling_counts[nrow(rolling_counts),]) 
+print(g)
+#> Warning in scale_x_date(date_breaks = "1 months", date_labels = "%b"): A <numeric> value was passed to a Date scale.
+#> ℹ The value was converted to a <Date> object.
+#> A <numeric> value was passed to a Date scale.
+#> ℹ The value was converted to a <Date> object.
+```
+
+<img src="man/figures/README-rolling_no_log-1.png" alt="" width="100%" />
+
 ## GRFP data
 
 The [NSF Graduate Research Fellowship Program](https://www.nsfgrfp.org)
