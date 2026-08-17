@@ -116,6 +116,40 @@ g <- ggplot(grants_recent, aes(x=dayofyear, y=estimatedTotalAmt_by_year/1e9, col
 print(g)
 ```
 
+## Keywords
+
+Let's look just at awards made in any program with "bio" or "systematics" or "evolution" in the name (biology grants) and see how words have changed between those that mention collections-related work (voucher, collection, field work, fieldwork, specimen) or those that mention AI (AI, artificial intelligence, LLM, large language model) in the abstract. First as a proportion of all the grants of either kind:
+
+```{r systematics_bio}
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(scales)
+
+data(grants)
+bio <- grants[grepl("SYSTEMATICS|BIO|EVOLUTION", grants$program, ignore.case=TRUE),]
+AI_words <- paste0(c(" AI ", "Artificial Intelligence", " LLM ", "Large.Language Model"), collapse="|")
+collections_words <- paste0(c("voucher", "collection", "field work", "fieldwork", "specimen"), collapse="|")
+bio$AI <- grepl(AI_words, bio$abstractText, ignore.case=TRUE)
+bio$Collections <- grepl(collections_words, bio$abstractText, ignore.case=TRUE)
+bio_relevant <- subset(bio, AI | Collections)
+bio_relevant$Type <- "Both"
+bio_relevant$Type[!bio_relevant$AI] <- "Collections"
+bio_relevant$Type[!bio_relevant$Collections] <- "AI"
+bio_relevant$date_formatted <- as.Date(bio_relevant$date, format="%m/%d/%Y")
+bio_relevant <- bio_relevant[!is.na(bio_relevant$date_formatted),]
+bio_relevant$year <- as.numeric(format(bio_relevant$date_formatted, "%Y"))
+bio_aggregate <- bio_relevant |> group_by(year, Type) |> summarise(count=n(), funds=sum(as.numeric(fundsObligatedAmt)), .groups = "drop_last")
+g <- ggplot(bio_aggregate, aes(x=year, y=funds, fill=Type))  + xlim(2016,NA) + geom_area(position = "fill") + xlab("Year of grant") + ylab("Proportion of funds") + theme_minimal() + ggtitle("Biology grants: division of funding between AI and collections grants") + scale_fill_manual(values=c("firebrick1", "darkorchid", "dodgerblue"))
+print(g)
+```
+
+
+```{r systematics_bio_line}
+g <- ggplot(bio_aggregate, aes(x=year, y=funds, colour=Type))  + geom_line() + xlab("Year of grant") + ylab("Total funds") + theme_minimal() + ggtitle("Biology grants: division of funding between AI and collections grants") + scale_fill_manual(values=c("firebrick1", "darkorchid", "dodgerblue")) + scale_y_continuous(labels = unit_format(unit = "M", scale = 1e-6))
+print(g)
+```
+
 ## Table of award info
 
 We can also look at a table with the number, not total money, of grants by state or territory by academic semester, for example (only including this year up to the last cache of the data).

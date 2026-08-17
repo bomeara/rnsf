@@ -6,7 +6,7 @@
 Unofficial package to interface with NSF API
 
 It also has abstracts, dates, and more information for all grants up to
-2026-08-01.
+2026-08-14.
 
 - Webpage with package information: <https://bomeara.github.io/rnsf/>
 - Github page: <https://github.com/bomeara/rnsf/>
@@ -141,6 +141,55 @@ print(g)
 
 <img src="man/figures/README-bergogram-1.png" alt="" width="100%" />
 
+## Keywords
+
+Let’s look just at awards made in any program with “bio” or
+“systematics” or “evolution” in the name (biology grants) and see how
+words have changed between those that mention collections-related work
+(voucher, collection, field work, fieldwork, specimen) or those that
+mention AI (AI, artificial intelligence, LLM, large language model) in
+the abstract. First as a proportion of all the grants of either kind:
+
+``` r
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(scales)
+#> 
+#> Attaching package: 'scales'
+#> The following object is masked from 'package:viridis':
+#> 
+#>     viridis_pal
+
+data(grants)
+bio <- grants[grepl("SYSTEMATICS|BIO|EVOLUTION", grants$program, ignore.case=TRUE),]
+AI_words <- paste0(c(" AI ", "Artificial Intelligence", " LLM ", "Large.Language Model"), collapse="|")
+collections_words <- paste0(c("voucher", "collection", "field work", "fieldwork", "specimen"), collapse="|")
+bio$AI <- grepl(AI_words, bio$abstractText, ignore.case=TRUE)
+bio$Collections <- grepl(collections_words, bio$abstractText, ignore.case=TRUE)
+bio_relevant <- subset(bio, AI | Collections)
+bio_relevant$Type <- "Both"
+bio_relevant$Type[!bio_relevant$AI] <- "Collections"
+bio_relevant$Type[!bio_relevant$Collections] <- "AI"
+bio_relevant$date_formatted <- as.Date(bio_relevant$date, format="%m/%d/%Y")
+bio_relevant <- bio_relevant[!is.na(bio_relevant$date_formatted),]
+bio_relevant$year <- as.numeric(format(bio_relevant$date_formatted, "%Y"))
+bio_aggregate <- bio_relevant |> group_by(year, Type) |> summarise(count=n(), funds=sum(as.numeric(fundsObligatedAmt)), .groups = "drop_last")
+g <- ggplot(bio_aggregate, aes(x=year, y=funds, fill=Type))  + xlim(2016,NA) + geom_area(position = "fill") + xlab("Year of grant") + ylab("Proportion of funds") + theme_minimal() + ggtitle("Biology grants: division of funding between AI and collections grants") + scale_fill_manual(values=c("firebrick1", "darkorchid", "dodgerblue"))
+print(g)
+#> Warning: Removed 55 rows containing non-finite outside the scale range
+#> (`stat_align()`).
+```
+
+<img src="man/figures/README-systematics_bio-1.png" alt="" width="100%" />
+
+``` r
+g <- ggplot(bio_aggregate, aes(x=year, y=funds, colour=Type))  + geom_line() + xlab("Year of grant") + ylab("Total funds") + theme_minimal() + ggtitle("Biology grants: division of funding between AI and collections grants") + scale_fill_manual(values=c("firebrick1", "darkorchid", "dodgerblue")) + scale_y_continuous(labels = unit_format(unit = "M", scale = 1e-6))
+print(g)
+```
+
+<img src="man/figures/README-systematics_bio_line-1.png" alt="" width="100%" />
+
 ## Table of award info
 
 We can also look at a table with the number, not total money, of grants
@@ -163,58 +212,58 @@ knitr::kable(grants_aggregated)
 
 | Area | 2024 Spring | 2024 Fall | 2025 Spring | 2025 Fall | 2026 Spring | 2026 Fall |
 |:---|---:|---:|---:|---:|---:|---:|
-| California | 508 | 752 | 361 | 586 | 275 | 226 |
-| New York | 371 | 475 | 256 | 371 | 152 | 168 |
-| Texas | 324 | 415 | 224 | 355 | 142 | 137 |
-| Massachusetts | 327 | 410 | 189 | 305 | 125 | 111 |
-| Pennsylvania | 243 | 282 | 165 | 233 | 116 | 96 |
-| Illinois | 218 | 277 | 122 | 224 | 81 | 65 |
-| Virginia | 161 | 227 | 89 | 139 | 68 | 67 |
-| Florida | 184 | 225 | 105 | 179 | 102 | 65 |
-| Michigan | 208 | 215 | 97 | 188 | 76 | 57 |
-| North Carolina | 153 | 210 | 103 | 181 | 72 | 57 |
-| Colorado | 111 | 183 | 73 | 146 | 45 | 55 |
-| Arizona | 101 | 177 | 65 | 99 | 37 | 48 |
-| Georgia | 137 | 171 | 78 | 147 | 57 | 44 |
-| Indiana | 130 | 166 | 83 | 157 | 59 | 48 |
-| Maryland | 118 | 147 | 79 | 129 | 80 | 43 |
-| New Jersey | 123 | 146 | 90 | 138 | 63 | 36 |
-| Washington | 97 | 144 | 68 | 106 | 42 | 43 |
-| Ohio | 110 | 134 | 73 | 106 | 50 | 43 |
-| Tennessee | 78 | 108 | 41 | 83 | 35 | 26 |
-| Alabama | 63 | 105 | 51 | 74 | 36 | 40 |
-| Wisconsin | 76 | 105 | 64 | 91 | 45 | 37 |
-| South Carolina | 60 | 102 | 31 | 66 | 31 | 35 |
-| District of Columbia | 51 | 101 | 42 | 55 | 31 | 19 |
-| Minnesota | 79 | 101 | 47 | 62 | 26 | 20 |
-| Rhode Island | 66 | 84 | 46 | 71 | 47 | 46 |
-| Oregon | 68 | 83 | 41 | 65 | 27 | 24 |
-| Iowa | 54 | 77 | 36 | 66 | 22 | 34 |
-| Louisiana | 54 | 77 | 30 | 68 | 33 | 26 |
-| Utah | 44 | 77 | 35 | 65 | 25 | 19 |
-| Missouri | 74 | 76 | 64 | 63 | 41 | 33 |
-| Connecticut | 66 | 63 | 52 | 66 | 32 | 22 |
-| New Mexico | 34 | 62 | 21 | 38 | 21 | 23 |
-| Oklahoma | 42 | 59 | 23 | 51 | 26 | 20 |
-| Kansas | 29 | 58 | 14 | 34 | 23 | 20 |
-| Nebraska | 39 | 55 | 22 | 44 | 13 | 20 |
-| Hawaii | 15 | 53 | 16 | 28 | 14 | 13 |
-| Kentucky | 36 | 51 | 28 | 40 | 16 | 20 |
-| Delaware | 18 | 47 | 31 | 37 | 18 | 19 |
-| Idaho | 16 | 43 | 16 | 31 | 13 | 14 |
-| Nevada | 12 | 43 | 11 | 31 | 9 | 16 |
-| New Hampshire | 21 | 36 | 21 | 35 | 11 | 17 |
-| Mississippi | 38 | 35 | 19 | 35 | 11 | 9 |
-| Alaska | 10 | 32 | 4 | 19 | 5 | 16 |
-| Montana | 19 | 32 | 8 | 22 | 8 | 12 |
-| Maine | 30 | 27 | 10 | 24 | 5 | 5 |
-| Arkansas | 27 | 25 | 10 | 26 | 14 | 7 |
-| West Virginia | 28 | 25 | 8 | 26 | 5 | 5 |
-| South Dakota | 20 | 22 | 17 | 17 | 4 | 8 |
-| Vermont | 13 | 22 | 12 | 13 | 6 | 4 |
-| Puerto Rico | 7 | 20 | 9 | 14 | 3 | 7 |
-| Wyoming | 10 | 19 | 7 | 18 | 5 | 3 |
-| North Dakota | 11 | 12 | 9 | 21 | 9 | 8 |
+| California | 508 | 752 | 361 | 586 | 273 | 380 |
+| New York | 371 | 475 | 256 | 371 | 160 | 251 |
+| Texas | 324 | 415 | 224 | 355 | 139 | 236 |
+| Massachusetts | 327 | 410 | 189 | 305 | 125 | 189 |
+| Pennsylvania | 243 | 282 | 165 | 233 | 117 | 165 |
+| Illinois | 218 | 277 | 122 | 224 | 81 | 113 |
+| Virginia | 161 | 227 | 89 | 139 | 69 | 119 |
+| Florida | 184 | 225 | 105 | 179 | 101 | 112 |
+| Michigan | 208 | 215 | 97 | 188 | 77 | 97 |
+| North Carolina | 153 | 210 | 103 | 181 | 73 | 110 |
+| Colorado | 111 | 183 | 73 | 146 | 44 | 92 |
+| Arizona | 101 | 177 | 65 | 99 | 37 | 73 |
+| Georgia | 137 | 171 | 78 | 147 | 55 | 85 |
+| Indiana | 130 | 166 | 83 | 157 | 60 | 71 |
+| Maryland | 118 | 147 | 79 | 129 | 80 | 84 |
+| New Jersey | 123 | 146 | 90 | 138 | 63 | 76 |
+| Washington | 97 | 144 | 68 | 106 | 42 | 78 |
+| Ohio | 110 | 134 | 73 | 106 | 49 | 75 |
+| Tennessee | 78 | 108 | 41 | 83 | 35 | 39 |
+| Alabama | 63 | 105 | 51 | 74 | 36 | 68 |
+| Wisconsin | 76 | 105 | 64 | 91 | 45 | 55 |
+| South Carolina | 60 | 102 | 31 | 66 | 31 | 59 |
+| District of Columbia | 51 | 101 | 42 | 55 | 31 | 46 |
+| Minnesota | 79 | 101 | 47 | 62 | 27 | 41 |
+| Rhode Island | 66 | 84 | 46 | 71 | 47 | 62 |
+| Oregon | 68 | 83 | 41 | 65 | 27 | 39 |
+| Iowa | 54 | 77 | 36 | 66 | 23 | 57 |
+| Louisiana | 54 | 77 | 30 | 68 | 33 | 58 |
+| Utah | 44 | 77 | 35 | 65 | 26 | 36 |
+| Missouri | 74 | 76 | 64 | 63 | 41 | 51 |
+| Connecticut | 66 | 63 | 52 | 66 | 32 | 46 |
+| New Mexico | 34 | 62 | 21 | 38 | 21 | 45 |
+| Oklahoma | 42 | 59 | 23 | 51 | 26 | 36 |
+| Kansas | 29 | 58 | 14 | 34 | 24 | 34 |
+| Nebraska | 39 | 55 | 22 | 44 | 14 | 29 |
+| Hawaii | 15 | 53 | 16 | 28 | 14 | 23 |
+| Kentucky | 36 | 51 | 28 | 40 | 16 | 41 |
+| Delaware | 18 | 47 | 31 | 37 | 19 | 32 |
+| Idaho | 16 | 43 | 16 | 31 | 14 | 23 |
+| Nevada | 12 | 43 | 11 | 31 | 10 | 28 |
+| New Hampshire | 21 | 36 | 21 | 35 | 11 | 25 |
+| Mississippi | 38 | 35 | 19 | 35 | 10 | 17 |
+| Alaska | 10 | 32 | 4 | 19 | 4 | 23 |
+| Montana | 19 | 32 | 8 | 22 | 8 | 26 |
+| Maine | 30 | 27 | 10 | 24 | 5 | 11 |
+| Arkansas | 27 | 25 | 10 | 26 | 14 | 11 |
+| West Virginia | 28 | 25 | 8 | 26 | 5 | 13 |
+| South Dakota | 20 | 22 | 17 | 17 | 4 | 17 |
+| Vermont | 13 | 22 | 12 | 13 | 6 | 9 |
+| Puerto Rico | 7 | 20 | 9 | 14 | 3 | 11 |
+| Wyoming | 10 | 19 | 7 | 18 | 5 | 5 |
+| North Dakota | 11 | 12 | 9 | 21 | 9 | 12 |
 | Virgin Islands of the U.S. | 0 | 3 | 1 | 1 | 0 | 0 |
 | American Samoa | 0 | 1 | 0 | 0 | 0 | 0 |
 | Guam | 0 | 0 | 2 | 1 | 0 | 0 |
