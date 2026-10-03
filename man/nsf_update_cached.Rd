@@ -15,6 +15,6 @@ Adds grants after the last cached ones. However, it seemed to only add 60 grants
 \examples{
 # not running as it's slow
 # grants <- nsf_update_cached()
-# usethis::use_data(grants, overwrite=TRUE) # if you are updating the package as well
+# piggyback_one_year_grants(grants, format(Sys.Date(), "\%Y"))
 
 }

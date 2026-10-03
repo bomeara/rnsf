@@ -28,6 +28,6 @@ This follows the advice from http://www.sthda.com/english/wiki/text-mining-and-w
 Make a word cloud of all the interesting words
 }
 \examples{
-data(grants)
+grants <- load_nsf_grants(year_start=2020, year_end=2024)
 nsf_wordcloud(grants$abstractText[1:10])
 }

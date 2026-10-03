@@ -283,12 +283,12 @@ nsf_get_all <- function(save_file="NSFAllGrants.rda", startdate=NULL) {
 #' @examples
 #' # not running as it's slow
 #' # grants <- nsf_update_cached()
-#' # usethis::use_data(grants, overwrite=TRUE) # if you are updating the package as well
+#' # piggyback_one_year_grants(grants, format(Sys.Date(), "%Y"))
 #'
 #' @return A data.frame with the original grants data and appended new data
 #' @export
 nsf_update_cached <- function() {
-	data(grants)
+	grants <- load_nsf_grants(year_start=1960, year_end=NA, update_current_year=FALSE)
 	dates <- as.Date(grants$date, format = "%m/%d/%Y")
 	most_recent <- max(dates, na.rm=TRUE)
 	next_day <- most_recent+1
@@ -297,41 +297,110 @@ nsf_update_cached <- function() {
 		grants <- plyr::rbind.fill(grants, grants_new)
 	}
 	print(paste0("\n\nIn total, ", nrow(grants_new), " were added, there are now ", nrow(grants), " grants total"))
-	print("Remember, if you are using this to update the data in the package, assuming the results are output into an object called grants, use usethis::use_data(grants, overwrite=TRUE) to update the package")
+	print(
+		"Remember, if you are using this to update the data in the package, assuming the results are output into an object called grants, use piggyback_all_grants(grants) to update the package"
+	)
 	return(grants)
 }
 
 #' Update cached information
 #'
+#' Adds grants, pulling all the ones from this year, and uses piggyback to store the info.
+#'
+#' @param override_shrinkage By default, if an update results in fewer grants, it will stop with an error (we don't want to overwrite the cache if there was a failure to load grants). If TRUE, it will add grants anyway.
+#' @examples
+#' # not running as it's slow
+#' # grants <- nsf_update_cached_this_year()
+#'
+#' @return A data.frame with the original grants data from this year and appended new data
+#' @export
+nsf_update_cached_this_year <- function(override_shrinkage=FALSE) {
+	grants <- load_nsf_grants(
+		year_start = NA,
+		year_end = NA,
+		update_current_year = FALSE
+	)
+	dates <- as.Date(grants$date, format = "%m/%d/%Y")
+	grants$year <- as.numeric(format(dates, "%Y"))
+	current_year <- as.numeric(format(Sys.Date(), "%Y"))
+	grants_through_last_year <- subset(grants, year < current_year)
+	grants_cached_this_year <- subset(grants, year == current_year)
+	grants_through_last_year$year <- NULL
+	grants_this_year <- nsf_get_all(
+		save_file = NULL,
+		startdate = paste0("01/01/", current_year)
+	)
+	grants_this_year$date_formatted <- as.Date(
+		grants_this_year$date,
+		format = "%m/%d/%Y"
+	)
+	grants_this_year$year <- as.numeric(format(
+		grants_this_year$date_formatted,
+		"%Y"
+	))
+	grants <- grants_this_year
+	if(nrow(grants_through_last_year)>0) {
+		grants <- dplyr::bind_rows(grants_through_last_year, grants_this_year)
+	}
+	print(paste0(
+		"originally had ",
+		nrow(grants_cached_this_year),
+		" for this year, now have ",
+		nrow(grants_this_year),
+		"; there are ",
+		nrow(grants),
+		" grants total"
+	))
+	if(nrow(grants_cached_this_year)<nrow(grants_this_year)) {
+		if(!override_shrinkage) {
+			stop(paste0("There were only ", nrow(grants_this_year), " rows and ", ncol(grants_this_year), " columns of the updated grants but ", nrow(grants_cached_this_year), " rows and ", ncol(grants_cached_this_year), " columns of the cached grants, indicating something went wrong (perhaps the API failed?)"))
+		}
+	}
+	piggyback_one_year_grants(grants, format(Sys.Date(), "%Y"))
+	return(grants)
+}
+
+#' Update this year's information
+#'
 #' Adds grants, pulling all the ones from this year.
 #'
 #' @examples
 #' # not running as it's slow
-#' # grants <- nsf_update_cached_this_year()
-#' # usethis::use_data(grants, overwrite=TRUE) # if you are updating the package as well
+#' # grants <- nsf_update_this_year(grants)
 #'
 #' @return A data.frame with the original grants data and appended new data
 #' @export
-nsf_update_cached_this_year <- function() {
-	data(grants)
+nsf_update_this_year <- function(grants) {
 	dates <- as.Date(grants$date, format = "%m/%d/%Y")
 	grants$year <- as.numeric(format(dates, "%Y"))
 	current_year <- as.numeric(format(Sys.Date(), "%Y"))
-	grants_through_last_year <- subset(grants, year<current_year)
-	grants_cached_this_year <- subset(grants, year==current_year)
+	grants_through_last_year <- subset(grants, year < current_year)
+	grants_cached_this_year <- subset(grants, year == current_year)
 	grants_through_last_year$year <- NULL
-	grants_this_year <- nsf_get_all(save_file = NULL, startdate = paste0("01/01/", current_year))
+	grants_this_year <- nsf_get_all(
+		save_file = NULL,
+		startdate = paste0("01/01/", current_year)
+	)
+	grants_this_year$date <- grants_this_year$date_formatted <- as.Date(
+		grants_this_year$date,
+		format = "%m/%d/%Y"
+	)
+	grants_this_year$year <- as.numeric(format(
+		grants_this_year$date_formatted,
+		"%Y"
+	))
 	grants <- dplyr::bind_rows(grants_through_last_year, grants_this_year)
-	print(paste0("originally had ", nrow(grants_cached_this_year), " for this year, now have ", nrow(grants_this_year), "; there are ", nrow(grants), " grants total"))
+	print(paste0(
+		"originally had ",
+		nrow(grants_cached_this_year),
+		" for this year, now have ",
+		nrow(grants_this_year),
+		"; there are ",
+		nrow(grants),
+		" grants total"
+	))
 	return(grants)
 }
-
-#' Grant information
-#'
-#' A dataset of NSF awards from its start until the package was last updated
-#' @format A data frame with one row per award and columns with award information
-"grants"
-
 
 #' GRFP information
 #'
@@ -350,7 +419,7 @@ nsf_update_cached_this_year <- function() {
 #' Create a wordcloud of text. This excludes common English words ("the", "and") but you can add your own to exclude as well. This uses the wordcloud package for plotting, and you can pass other arguments to that to make the plot prettier (see ?wordcloud::wordcloud)
 #' This follows the advice from http://www.sthda.com/english/wiki/text-mining-and-word-cloud-fundamentals-in-r-5-simple-steps-you-should-know on making a word cloud
 #' @examples
-#' data(grants)
+#' grants <- load_nsf_grants(year_start=2020, year_end=2024)
 #' nsf_wordcloud(grants$abstractText[1:10])
 #' @export
 nsf_wordcloud <- function(text=nsf_get_all()$abstractText, prune_words=c("will", "nfs"), max_words=500, ...) {
@@ -506,4 +575,116 @@ compile_grfp <- function() {
 		grfp <- plyr::rbind.fill(grfp, entry)
 	}
 	return(grfp)
+}
+
+#' This will be used just once, to convert from the old style of storing as rdata to the new approach using piggyback
+piggyback_all_grants <- function(grants) {
+	grants_modified <- grants
+	grants_modified$date_formatted <- as.Date(
+		grants_modified$date,
+		format = "%m/%d/%Y"
+	)
+	grants_modified <- grants_modified[!is.na(grants_modified$date_formatted), ]
+	grants_modified$year <- as.numeric(format(
+		grants_modified$date_formatted,
+		"%Y"
+	))	
+	all_years <- sort(unique(grants_modified$year))
+	for (year_index in sequence(length(all_years))) {
+		grants_of_the_year <- subset(
+			grants_modified,
+			year == all_years[year_index]
+		)
+		output_file <- file.path(tempdir(), paste0("grants_", all_years[year_index], ".rds"))
+		saveRDS(grants_of_the_year, output_file)
+		piggyback::pb_upload(output_file, repo = "bomeara/rnsf")
+		file.remove(output_file)
+	}
+	return(all_years)
+}
+
+# use this to update the grants for this calendar year only
+piggyback_one_year_grants <- function(grants, focal_year=2026) {
+	grants_modified <- grants
+	grants_modified$date_formatted <- as.Date(
+		grants_modified$date,
+		format = "%m/%d/%Y"
+	)
+	grants_modified <- grants_modified[!is.na(grants_modified$date_formatted), ]
+	grants_modified$year <- as.numeric(format(
+		grants_modified$date_formatted,
+		"%Y"
+	))
+	
+	grants_of_the_year <- subset(
+		grants_modified,
+		year == focal_year
+	)
+	
+	if(nrow(grants_of_the_year)>0) {
+		output_file <- file.path(
+			tempdir(),
+			paste0("grants_", focal_year, ".rds")
+		)
+		
+		saveRDS(grants_of_the_year, output_file)
+		piggyback::pb_upload(output_file, repo = "bomeara/rnsf")
+		file.remove(output_file)
+	}
+	return(nrow(grants_of_the_year))
+}
+
+#' Load in NSF grants
+#' 
+#' This will pull in grants from the rnsf releases on github. By default, it will only pull in the current calendar year's grants and then check to see if NSF has any new ones since the latest package release. You can change this behavior with arguments below. 
+#' @param year_start The earliest year of grants to incorporate (earliest available is 1960). Defaults to the current year
+#' @param year_end The latest year of grants to incorporate. Defaults to the current year.
+#' @param update_current_year If TRUE, and the year_end is the current year, it will automatically try to update the set of grants with the most recent ones from NSF's API. By default, it will just use the cached grants.
+#' @return A data.frame of the grants for the chosen year(s).
+#' @details 
+#' To prevent the risk of including grants more than once, if update_current_year is true and the year_end is left NA or set to the current year, it will pull in all the grants from the current year, replacing the cached ones. This becomes slow by the end of the year.
+#' @export 
+#' @examples
+#' recent_grants_2018_2026 <- load_nsf_grants(year_start=2018, year_end=2026)
+load_nsf_grants <- function(year_start=NA, year_end=NA, update_current_year=FALSE) {
+	if(is.na(year_start)) {
+		year_start <- year_end <- format(Sys.Date(), "%Y")
+	}
+	if(year_start<1960) {
+		warning("The earliest year in the data set is 1960")
+		year_start <- 1960	
+	}
+	if(is.na(year_end)) {
+		year_end <- format(Sys.Date(), "%Y")	
+	}
+	all_years <- seq(from=year_start, to=year_end, by=1)
+	grants <- data.frame()
+	for (year_index in sequence(length(all_years))) {
+		try({
+			grants_of_the_year <- pb_read_ripoff(
+				paste0("grants_", all_years[year_index], ".rds"),
+				repo = "bomeara/rnsf"
+			)
+			if(nrow(grants_of_the_year)>0) {
+				grants <- dplyr::bind_rows(grants, grants_of_the_year)	
+			}
+		})
+	}
+	if(year_end == format(Sys.Date(), "%Y") & update_current_year) {
+		grants <- nsf_update_this_year(grants)
+	}
+	return(grants)
+}
+
+# The cran version of piggyback doesn't have pb_read yet (Oct 3, 2026), so copying it over as a workaround. See the original at https://github.com/ropensci/piggyback/blob/master/R/pb_read.R
+pb_read_ripoff <- function(file, repo) {
+	read_function <- readRDS
+	piggyback::pb_download(
+		file = file,
+		dest = tempdir(check = TRUE),
+		repo = "bomeara/rnsf",
+		overwrite = TRUE
+	)
+
+	return(read_function(file.path(tempdir(), file)))
 }

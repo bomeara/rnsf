@@ -1,6 +1,7 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>/404.html</loc></url>
 <url><loc>/LICENSE-text.html</loc></url>
+<url><loc>/articles/index.html</loc></url>
 <url><loc>/authors.html</loc></url>
 <url><loc>/index.html</loc></url>
 <url><loc>/reference/abbreviation_to_state.html</loc></url>
@@ -11,12 +12,15 @@
 <url><loc>/reference/grants.html</loc></url>
 <url><loc>/reference/grfp.html</loc></url>
 <url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/load_nsf_grants.html</loc></url>
 <url><loc>/reference/nsf_get_all.html</loc></url>
 <url><loc>/reference/nsf_get_person.html</loc></url>
 <url><loc>/reference/nsf_return.html</loc></url>
 <url><loc>/reference/nsf_update_cached.html</loc></url>
 <url><loc>/reference/nsf_update_cached_this_year.html</loc></url>
+<url><loc>/reference/nsf_update_this_year.html</loc></url>
 <url><loc>/reference/nsf_wordcloud.html</loc></url>
+<url><loc>/reference/piggyback_all_grants.html</loc></url>
 <url><loc>/reference/save_grant_csvs.html</loc></url>
 </urlset>
 

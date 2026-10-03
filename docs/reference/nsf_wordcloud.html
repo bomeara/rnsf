@@ -18,7 +18,7 @@ This follows the advice from http://www.sthda.com/english/wiki/text-mining-and-w
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rnsf</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2026.09.24.01</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2026.10.03.01</span>
       </span>
     </div>
 
@@ -81,9 +81,54 @@ This follows the advice from http://www.sthda.com/english/wiki/text-mining-and-w
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">grants</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">grants</span> <span class="op">&lt;-</span> <span class="fu"><a href="load_nsf_grants.html">load_nsf_grants</a></span><span class="op">(</span>year_start<span class="op">=</span><span class="fl">2020</span>, year_end<span class="op">=</span><span class="fl">2024</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> All local files already up-to-date!</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> All local files already up-to-date!</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> All local files already up-to-date!</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> All local files already up-to-date!</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> All local files already up-to-date!</span>
 <span class="r-in"><span><span class="fu">nsf_wordcloud</span><span class="op">(</span><span class="va">grants</span><span class="op">$</span><span class="va">abstractText</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>transformations could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>experiments could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>hydromechanical could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>influences could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>sinkholes could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>understand could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>individuals could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>providing could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>signifiers could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>instrument could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>aquatic could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>fundamental could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>otherwise could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>populations could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>relatively could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>springstreams could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>commercial could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>entering could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>generate could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>processing could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>products could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>colleges could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>increasing could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>lsamp could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>mississippi could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>potential could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>preparation could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>programs could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>promote could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>region could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>resources could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>biology could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>genetic could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>group could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>roles could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>sequence could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>space could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>training could not be fit on page. It will not be plotted.</span>
 <span class="r-plt img"><img src="nsf_wordcloud-1.png" alt="" width="700" height="433"></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>persistence could not be fit on page. It will not be plotted.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>scholarships could not be fit on page. It will not be plotted.</span>
 </code></pre></div>
     </div>
   </div>

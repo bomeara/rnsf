@@ -1,5 +1,7 @@
 ---
 output: github_document
+execute:
+  echo: false
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -7,6 +9,9 @@ output: github_document
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
+  warning = FALSE,
+  echo = FALSE,
+  message = FALSE,
   comment = "#>",
   fig.path = "man/figures/README-",
   out.width = "100%",
@@ -15,8 +20,8 @@ knitr::opts_chunk$set(
   fig.dpi = 600
 )
 library(rnsf)
-data(grants)
-most_recent <- max(as.Date(grants$date, format="%m/%d/%Y"))
+grants_this_year <- load_nsf_grants(update_current_year=FALSE)
+most_recent <- max(as.Date(grants_this_year$date, format="%m/%d/%Y"))
 ```
 
 # rnsf
@@ -30,54 +35,74 @@ It also has abstracts, dates, and more information for all grants up to `r most_
 
 # Installation
 
-This package has a huge (>500 MB) R data file containing all the cached grant info (abstracts, money, institutions, etc.). I have stored it as a [git large file storage file](https://git-lfs.com) inside `data`. Thus, the usual approach to installing from github won't work as the data won't be loaded in the correct way. Instead, from a terminal or command line, on a computer with git and git-lfs installed, you will have to:
-
-`git clone https://github.com/bomeara/rnsf.git` (note this is in your computer terminal, not an R session!)
-
-and then use `R CMD INSTALL rnsf` to install the package (or, from within R, `devtools::install('rnsf')` or whatever the path is to the directory you have cloned).
-
-If someone wants to make an easier way to do this, please reach out!
-
-# Examples
-
-## Getting cached data
-
-This package caches data on over 500,000 funded NSF grants (it's large, which is why the package will take a while to install, and why it will never be on CRAN with its 5 MB maximum size). You can use it.
+**New (Oct 2026)** You can just install this package the way you would any R package on github:
 
 ```
-library(rnsf)
-data(grants)
+remotes::install_github("bomeara/rnsf")
 ```
 
-This will give you a data.frame with all data: `head(grants)`
+(You'll need to first install `remotes` (by doing `install.packages("remotes")`) if you don't already have it). 
 
-It has multiple date fields which are in "%m/%d/%Y" format (but everything is stored as a raw list, leaving to the user to process it). 
+Thanks to the [piggyback](https://github.com/ropensci/piggyback) package, the huge cached files are now stored as releases rather than within the package, making install easy. 
 
-## New search
+# Usage
 
-You can also do a new search. For example, to get all info on ants:
+There are three main ways to get data:
 
-```{r ants, warning=FALSE}
-library(rnsf)
-ants <- rnsf::nsf_return(keyword="Formicidae")
+* Use `rnsf::nsf_return()` with various arguments to pull in data directly from NSF's API for awards. Good if you want to find info by keyword, state, or other fields.
+    * For example, if we're curious about grants relevant to Yellowstone National Park, we could call `rnsf:nsf_return(keyword="Yellowstone")`. It will call the API multiple times until it has downloaded info on all grants with that keyword and returned a data.frame object.
+* Use `rnsf::load_nsf_grants()` to load cached data (available [here](https://github.com/bomeara/rnsf/releases/tag/most-recent)) for years you specify. By default, it loads cached data from the most recent year. Good if you want to do an analysis across thousands of grants.
+    * If we wanted to look at grants from 2020 to the present, we can call `rnsf::load_nsf_grants(year_start=2020)` and it will download the cached grants.
+	* If we wanted to add any grants 
+* Use `data(grfp)` after loading the package to load information on all the Graduate Research Fellowship Program awards and honorable mentions (these are not available from NSF's API, so I had to download each year's pair of spreadsheets).
+
+Below are some examples of the package's utility; see <https://github.com/bomeara/rnsf/blob/master/README.Rmd> for the details of the code to make the plots.
+
+## Bergograms
+
+Scientist Jeremy Berg often graphs federal funding over time (see <https://jeremymberg.github.io/jeremyberg.github.io/>). The very useful website [Grant Witness](https://grantwitness.org) has adopted these graphs, including invaluable updates of national funding and breakdowns by NSF division (see, for example, [here](https://grantwitness.org/nsf/analyses/agency-pulse-nsf-grants)). With the `rnsf` package we can look at finer detail. For example, the US Census splits the 50 US states into four different regions: Northeast, Midwest, South, and West. We can look at funding over time by region instead of nationally:
+
+```{r bergogram, warning=FALSE, echo=FALSE}
+library(tidyverse)
+recent_grants <- rnsf::load_nsf_grants(year_start=2019)
+recent_grants <- dplyr::left_join(recent_grants, data.frame(perfStateCode=state.abb, Region=state.region), by='perfStateCode')
+recent_grants$Region <- gsub("North Central", "Midwest", as.character(recent_grants$Region))
+recent_grants$date <- as.Date(recent_grants$date, format="%m/%d/%Y")
+recent_grants$year <- format(recent_grants$date, "%Y")
+recent_grants$dayofyear <- timeDate::dayOfYear(timeDate::timeDate(recent_grants$date))
+recent_grants$estimatedTotalAmt <- as.numeric(recent_grants$estimatedTotalAmt)
+recent_grants$count <- 1
+
+# make useful colors
+years <- sort(unique(recent_grants$year))
+n_years <- length(years)
+if (n_years >= 2) {
+  n_gray <- max(0, n_years - 2)
+  gray_vals <- if (n_gray>0) gray.colors(n_gray, start=0.85, end=0.4) else character(0)
+  cols <- c(gray_vals, "blue", "red")
+} else {
+  cols <- if (n_years==1) "blue" else character(0)
+}
+names(cols) <- years
+
+organized_grants <- recent_grants |> arrange(year, dayofyear) |> filter(!is.na(Region)) |> group_by(year, Region) |> mutate(estimatedTotalAmt_by_year = cumsum(estimatedTotalAmt), total_grants = cumsum(count)) |> ungroup()
+
+g <- ggplot(organized_grants, aes(x=dayofyear, y=total_grants, colour=year)) + geom_line() + theme_minimal() + xlab("Day") + ylab("Number of grants awarded") + scale_x_date(date_breaks = "2 months", date_labels =  "%b") + facet_wrap(~Region) + scale_colour_manual(values=cols)
+
+print(g)
+
 ```
 
-# Visualization
+Note some important differences between the plots above and those from Grant Witness: they typically plot by financial year, not calendar year; they also filter out transfer grants (a grant moves between PIs or institutions) and the code above does not do that. 
 
-## Wordcloud
-
-There is a function for doing a wordcloud:
-
-```{r wordcloud, warning=FALSE}
-library(rnsf)
-nsf_wordcloud(ants$abstractText)
-```
+<details>
 
 ## Topic frequency over time
 
 The ozone hole was discovered in [1985](https://www.usatoday.com/story/news/nation/2025/05/19/what-happened-to-the-hole-in-the-ozone-layer/83644470007/): pollution led to a depletion of the ozone layer, which shields people (and other organisms) from a great deal of UV radiation. The world came together and passed the Montreal Protocol to limit the pollution, chlorofluorocarbons, that was causing the damage. The hole is healing, but still requires research and monitoring. We can see how NSF grants mentioning "ozone hole" changed over time (though not all grants mentioning "ozone hole" study this issue; some could be using it as a comparison to some other issue, for example). We can include a regression before and after 1985 and show the 95% CI for the proportion in each year (truncated by the y-axis limits).
 
 ```{r ozone}
+#| code-fold: true
 library(rnsf)
 library(ggplot2)
 library(timeDate)
@@ -85,7 +110,8 @@ library(dplyr)
 library(viridis)
 library(binom)
 
-data(grants) # or use grants <- rnsf::nsf_get_all() to get the most current list (will take hours) or grants <- nsf_update_cached() to update from the last cached version
+grants <- rnsf::load_nsf_grants(year_start=1980, year_end=1995)
+
 
 grants$ozone_hole <- grepl("ozone hole", grants$abstractText, ignore.case=TRUE)
 grants$date <- as.Date(grants$date, format="%m/%d/%Y")
@@ -99,34 +125,21 @@ grants_by_year$ozone_upper_percent_truncated <- sapply(grants_by_year$ozone_uppe
 g <- ggplot(grants_by_year, aes(x=year, y=ozone_percent, group=1))+ geom_errorbar(aes(ymin=ozone_lower_percent, ymax=ozone_upper_percent_truncated), colour="gray", alpha=0.4, width=0) + geom_point() + theme_minimal() + xlab("Year") + ylab("Percentage of grants mentioning 'ozone hole'") + geom_smooth(data=subset(grants_by_year, year<1985), se=FALSE, method="lm") + geom_smooth(data=subset(grants_by_year, year>=1985), se=FALSE, method="lm")  + ylim(c(0, 2*max(grants_by_year$ozone_percent)))
 print(g)
 ```
-
-## Bergogram
-
-We can plot funding over time, inspired by (but not endorsed by) Jeremy Berg's graphs on federal funding (see <https://jeremymberg.github.io/jeremyberg.github.io/>). Also see <https://grant-witness.us/funding_curves.html#nsf-graphs> from Grant Witness.
-
-```{r bergogram, warning=FALSE}
-grants$date <- as.Date(grants$date, format="%m/%d/%Y")
-grants$year <- format(grants$date, "%Y")
-grants$dayofyear <- timeDate::dayOfYear(timeDate::timeDate(grants$date))
-grants$estimatedTotalAmt <- as.numeric(grants$estimatedTotalAmt)
-grants <- grants |> arrange(year, dayofyear) |> group_by(year) |> mutate(estimatedTotalAmt_by_year = cumsum(estimatedTotalAmt)) |> ungroup()
-grants <- grants[!is.na(grants$year),]
-grants_recent <- subset(grants, year>=2020)
-g <- ggplot(grants_recent, aes(x=dayofyear, y=estimatedTotalAmt_by_year/1e9, colour=year)) + geom_line() + theme_minimal() + xlab("Day") + ylab("Cumulative billions of dollars awarded") + scale_colour_viridis_d(option="turbo", begin=0.2) + scale_x_date(date_breaks = "1 month", date_labels =  "%b") 
-print(g)
-```
+</details>
 
 ## Keywords
 
 Let's look just at awards made in any program with "bio" or "systematics" or "evolution" in the name (biology grants) and see how words have changed between those that mention collections-related work (voucher, collection, field work, fieldwork, specimen) or those that mention AI (AI, artificial intelligence, LLM, large language model) in the abstract. First as a proportion of all the grants of either kind:
 
 ```{r systematics_bio}
+#| code-fold: true
+
 library(tidyr)
 library(dplyr)
 library(ggplot2)
 library(scales)
 
-data(grants)
+grants <- rnsf::load_nsf_grants(year_start=2016, update_current_year=FALSE)
 bio <- grants[grepl("SYSTEMATICS|BIO|EVOLUTION", grants$program, ignore.case=TRUE),]
 AI_words <- paste0(c(" AI ", "Artificial Intelligence", " LLM ", "Large.Language Model"), collapse="|")
 collections_words <- paste0(c("voucher", "collection", "field work", "fieldwork", "specimen"), collapse="|")
@@ -155,10 +168,12 @@ print(g)
 We can also look at a table with the number, not total money, of grants by state or territory by academic semester, for example (only including this year up to the last cache of the data).
 
 ```{r grantsbyyear}
+#| code-fold: true
+
 library(tidyr)
 library(knitr)
 
-data(grants)
+grants <- rnsf::load_nsf_grants(year_start=2024, update_current_year=FALSE)
 grants$awardeeStateCode <- toupper(grants$awardeeStateCode) # handle some early data that uses lowercase
 grants$academic_semester <- rnsf::date_to_academic_semester(as.Date(grants$date, format="%m/%d/%Y"))
 grants_aggregated <- grants |> filter(academic_semester %in% apply(expand.grid(c(2024:2026), c(" Fall", "  Spring")), 1, paste0, collapse="")) |> group_by(academic_semester, awardeeStateCode) |> summarise(total_awarded = n(), .groups = "drop_last") |> ungroup() |> tidyr::pivot_wider(names_from = academic_semester, values_from=total_awarded, values_fill=0) |> dplyr::arrange(desc(`2024 Fall`))
@@ -173,10 +188,12 @@ knitr::kable(grants_aggregated)
 We can see when the most recent grant has been awarded (relative to when this package was last built) by state or territory; we can also look to see how funding so far this year compares to average funding at this point of the year for 2017-2024 (so it encompasses two different administrations).
 
 ```{r recent}
+#| code-fold: true
+
 library(lubridate)
 library(ggrepel)
 
-data(grants)
+grants <- rnsf::load_nsf_grants(year_start=2017, update_current_year=FALSE)
 
 current_day_of_year <- lubridate::yday(Sys.Date())
 grants_modified <- grants
@@ -208,7 +225,9 @@ print(g)
 How is NSF awarding grants over time? This uses a two week rolling interval, showing the average grants awarded per day in that interval.
 
 ```{r rolling}
-data(grants)
+#| code-fold: true
+
+grants <- rnsf::load_nsf_grants(year_start=2020, update_current_year=FALSE)
 grants_modified <- grants
 grants_modified$date_formatted <- as.Date(grants_modified$date, format="%m/%d/%Y")
 grants_modified <- grants_modified[!is.na(grants_modified$date_formatted),]
@@ -248,8 +267,17 @@ print(g)
 And rolling window not on a log scale:
 
 ```{r rolling_no_log}
+#| code-fold: true
+
 g <- ggplot(rolling_counts, aes(x=dayofyear, y=count/14, colour=year)) + geom_line() + theme_minimal() + xlab("End of 2 week period") + ylab("Grants awarded per day, two week rolling average") + scale_colour_manual(values=cols) + scale_x_date(date_breaks = "1 months", date_labels =  "%b") + geom_point(data=rolling_counts[nrow(rolling_counts),]) 
 print(g)
+```
+
+## Wordclouds
+
+```{r wordcloud}
+ants <- rnsf::nsf_return(keyword="Formicidae")
+nsf_wordcloud(ants$abstractText)
 ```
 
 ## GRFP data
@@ -264,6 +292,7 @@ data(grfp)
 You can then plot information or do other analyses. For example, the number of awards in Mathematical Sciences over time:
 
 ```{r grfpplot}
+#| code-fold: true
 grfp_math <- grfp[grepl("Mathematical Sciences", grfp$Field.of.Study),] |> subset(award_level=="Awardee")
 grfp_math$year <- as.numeric(grfp_math$year)
 grfp_math_by_year <- grfp_math |> group_by(year) |> summarize(count=n()) |> ungroup()
@@ -274,6 +303,7 @@ print(g)
 And the frequency of different subfields of math, showing just the first twenty from the past ten years of awards:
 
 ```{r grfpsubfields}
+#| code-fold: true
 library(stringr)
 subfields <- stringr::str_to_title(gsub("Mathematical Sciences - ", "", grfp_math$Field.of.Study))
 popularity <- t(t(sort(table(subfields), decreasing=TRUE)))
@@ -288,17 +318,7 @@ Then the directory containing the package source:
 
 ```
 library(rnsf)
-grants <- nsf_update_cached_this_year() # perhaps worth doing a new nsf_get_all() after the beginning of the year
-usethis::use_data(grants, overwrite=TRUE) 
-devtools::install()
-```
-
-Then quit R and reopen (so it uses the latest saved grants).
-
-Then:
-
-```
-library(rnsf)
+grants_this_year <- nsf_update_cached_this_year() # perhaps worth doing a new nsf_get_all() after the beginning of the year
 devtools::build_readme()
 pkgdown::build_site()
 system("git add */*")

@@ -4,17 +4,19 @@
 \alias{nsf_update_cached_this_year}
 \title{Update cached information}
 \usage{
-nsf_update_cached_this_year()
+nsf_update_cached_this_year(override_shrinkage = FALSE)
+}
+\arguments{
+\item{override_shrinkage}{By default, if an update results in fewer grants, it will stop with an error (we don't want to overwrite the cache if there was a failure to load grants). If TRUE, it will add grants anyway.}
 }
 \value{
-A data.frame with the original grants data and appended new data
+A data.frame with the original grants data from this year and appended new data
 }
 \description{
-Adds grants, pulling all the ones from this year.
+Adds grants, pulling all the ones from this year, and uses piggyback to store the info.
 }
 \examples{
 # not running as it's slow
 # grants <- nsf_update_cached_this_year()
-# usethis::use_data(grants, overwrite=TRUE) # if you are updating the package as well
 
 }

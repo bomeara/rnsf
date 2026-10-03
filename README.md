@@ -13,60 +13,69 @@ It also has abstracts, dates, and more information for all grants up to
 
 # Installation
 
-This package has a huge (\>500 MB) R data file containing all the cached
-grant info (abstracts, money, institutions, etc.). I have stored it as a
-[git large file storage file](https://git-lfs.com) inside `data`. Thus,
-the usual approach to installing from github won’t work as the data
-won’t be loaded in the correct way. Instead, from a terminal or command
-line, on a computer with git and git-lfs installed, you will have to:
+**New (Oct 2026)** You can just install this package the way you would
+any R package on github:
 
-`git clone https://github.com/bomeara/rnsf.git` (note this is in your
-computer terminal, not an R session!)
+    remotes::install_github("bomeara/rnsf")
 
-and then use `R CMD INSTALL rnsf` to install the package (or, from
-within R, `devtools::install('rnsf')` or whatever the path is to the
-directory you have cloned).
+(You’ll need to first install `remotes` (by doing
+`install.packages("remotes")`) if you don’t already have it).
 
-If someone wants to make an easier way to do this, please reach out!
+Thanks to the [piggyback](https://github.com/ropensci/piggyback)
+package, the huge cached files are now stored as releases rather than
+within the package, making install easy.
 
-# Examples
+# Usage
 
-## Getting cached data
+There are three main ways to get data:
 
-This package caches data on over 500,000 funded NSF grants (it’s large,
-which is why the package will take a while to install, and why it will
-never be on CRAN with its 5 MB maximum size). You can use it.
+- Use `rnsf::nsf_return()` with various arguments to pull in data
+  directly from NSF’s API for awards. Good if you want to find info by
+  keyword, state, or other fields.
+  - For example, if we’re curious about grants relevant to Yellowstone
+    National Park, we could call
+    `rnsf:nsf_return(keyword="Yellowstone")`. It will call the API
+    multiple times until it has downloaded info on all grants with that
+    keyword and returned a data.frame object.
+- Use `rnsf::load_nsf_grants()` to load cached data (available
+  [here](https://github.com/bomeara/rnsf/releases/tag/most-recent)) for
+  years you specify. By default, it loads cached data from the most
+  recent year. Good if you want to do an analysis across thousands of
+  grants.
+  - If we wanted to look at grants from 2020 to the present, we can call
+    `rnsf::load_nsf_grants(year_start=2020)` and it will download the
+    cached grants.
+  - If we wanted to add any grants
+- Use `data(grfp)` after loading the package to load information on all
+  the Graduate Research Fellowship Program awards and honorable mentions
+  (these are not available from NSF’s API, so I had to download each
+  year’s pair of spreadsheets).
 
-    library(rnsf)
-    data(grants)
+Below are some examples of the package’s utility; see
+<https://github.com/bomeara/rnsf/blob/master/README.Rmd> for the details
+of the code to make the plots.
 
-This will give you a data.frame with all data: `head(grants)`
+## Bergograms
 
-It has multiple date fields which are in “%m/%d/%Y” format (but
-everything is stored as a raw list, leaving to the user to process it).
+Scientist Jeremy Berg often graphs federal funding over time (see
+<https://jeremymberg.github.io/jeremyberg.github.io/>). The very useful
+website [Grant Witness](https://grantwitness.org) has adopted these
+graphs, including invaluable updates of national funding and breakdowns
+by NSF division (see, for example,
+[here](https://grantwitness.org/nsf/analyses/agency-pulse-nsf-grants)).
+With the `rnsf` package we can look at finer detail. For example, the US
+Census splits the 50 US states into four different regions: Northeast,
+Midwest, South, and West. We can look at funding over time by region
+instead of nationally:
 
-## New search
+<img src="man/figures/README-bergogram-1.png" alt="" width="100%" />
 
-You can also do a new search. For example, to get all info on ants:
+Note some important differences between the plots above and those from
+Grant Witness: they typically plot by financial year, not calendar year;
+they also filter out transfer grants (a grant moves between PIs or
+institutions) and the code above does not do that.
 
-``` r
-library(rnsf)
-ants <- rnsf::nsf_return(keyword="Formicidae")
-#> [1] "Finished first batch"
-```
-
-# Visualization
-
-## Wordcloud
-
-There is a function for doing a wordcloud:
-
-``` r
-library(rnsf)
-nsf_wordcloud(ants$abstractText)
-```
-
-<img src="man/figures/README-wordcloud-1.png" alt="" width="100%" />
+<details>
 
 ## Topic frequency over time
 
@@ -83,63 +92,8 @@ comparison to some other issue, for example). We can include a
 regression before and after 1985 and show the 95% CI for the proportion
 in each year (truncated by the y-axis limits).
 
-``` r
-library(rnsf)
-library(ggplot2)
-library(timeDate)
-library(dplyr)
-#> 
-#> Attaching package: 'dplyr'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     filter, lag
-#> The following objects are masked from 'package:base':
-#> 
-#>     intersect, setdiff, setequal, union
-library(viridis)
-#> Loading required package: viridisLite
-library(binom)
-
-data(grants) # or use grants <- rnsf::nsf_get_all() to get the most current list (will take hours) or grants <- nsf_update_cached() to update from the last cached version
-
-grants$ozone_hole <- grepl("ozone hole", grants$abstractText, ignore.case=TRUE)
-grants$date <- as.Date(grants$date, format="%m/%d/%Y")
-grants$year <- as.numeric(format(grants$date, "%Y"))
-
-grants_by_year <- grants |> group_by(year) |> summarize(ozone = sum(ozone_hole), all = n())  |> ungroup()
-grants_by_year$ozone_percent <- 100 * grants_by_year$ozone / grants_by_year$all
-grants_by_year$ozone_lower_percent <- 100 * binom::binom.confint(x=grants_by_year$ozone, n=grants_by_year$all, method="exact")$lower
-grants_by_year$ozone_upper_percent <- 100 * binom::binom.confint(x=grants_by_year$ozone, n=grants_by_year$all, method="exact")$upper
-grants_by_year$ozone_upper_percent_truncated <- sapply(grants_by_year$ozone_upper_percent, min, 2*max(grants_by_year$ozone_percent))
-g <- ggplot(grants_by_year, aes(x=year, y=ozone_percent, group=1))+ geom_errorbar(aes(ymin=ozone_lower_percent, ymax=ozone_upper_percent_truncated), colour="gray", alpha=0.4, width=0) + geom_point() + theme_minimal() + xlab("Year") + ylab("Percentage of grants mentioning 'ozone hole'") + geom_smooth(data=subset(grants_by_year, year<1985), se=FALSE, method="lm") + geom_smooth(data=subset(grants_by_year, year>=1985), se=FALSE, method="lm")  + ylim(c(0, 2*max(grants_by_year$ozone_percent)))
-print(g)
-#> `geom_smooth()` using formula = 'y ~ x'
-#> `geom_smooth()` using formula = 'y ~ x'
-```
-
 <img src="man/figures/README-ozone-1.png" alt="" width="100%" />
-
-## Bergogram
-
-We can plot funding over time, inspired by (but not endorsed by) Jeremy
-Berg’s graphs on federal funding (see
-<https://jeremymberg.github.io/jeremyberg.github.io/>). Also see
-<https://grant-witness.us/funding_curves.html#nsf-graphs> from Grant
-Witness.
-
-``` r
-grants$date <- as.Date(grants$date, format="%m/%d/%Y")
-grants$year <- format(grants$date, "%Y")
-grants$dayofyear <- timeDate::dayOfYear(timeDate::timeDate(grants$date))
-grants$estimatedTotalAmt <- as.numeric(grants$estimatedTotalAmt)
-grants <- grants |> arrange(year, dayofyear) |> group_by(year) |> mutate(estimatedTotalAmt_by_year = cumsum(estimatedTotalAmt)) |> ungroup()
-grants <- grants[!is.na(grants$year),]
-grants_recent <- subset(grants, year>=2020)
-g <- ggplot(grants_recent, aes(x=dayofyear, y=estimatedTotalAmt_by_year/1e9, colour=year)) + geom_line() + theme_minimal() + xlab("Day") + ylab("Cumulative billions of dollars awarded") + scale_colour_viridis_d(option="turbo", begin=0.2) + scale_x_date(date_breaks = "1 month", date_labels =  "%b") 
-print(g)
-```
-
-<img src="man/figures/README-bergogram-1.png" alt="" width="100%" />
+</details>
 
 ## Keywords
 
@@ -150,43 +104,7 @@ words have changed between those that mention collections-related work
 mention AI (AI, artificial intelligence, LLM, large language model) in
 the abstract. First as a proportion of all the grants of either kind:
 
-``` r
-library(tidyr)
-library(dplyr)
-library(ggplot2)
-library(scales)
-#> 
-#> Attaching package: 'scales'
-#> The following object is masked from 'package:viridis':
-#> 
-#>     viridis_pal
-
-data(grants)
-bio <- grants[grepl("SYSTEMATICS|BIO|EVOLUTION", grants$program, ignore.case=TRUE),]
-AI_words <- paste0(c(" AI ", "Artificial Intelligence", " LLM ", "Large.Language Model"), collapse="|")
-collections_words <- paste0(c("voucher", "collection", "field work", "fieldwork", "specimen"), collapse="|")
-bio$AI <- grepl(AI_words, bio$abstractText, ignore.case=TRUE)
-bio$Collections <- grepl(collections_words, bio$abstractText, ignore.case=TRUE)
-bio_relevant <- subset(bio, AI | Collections)
-bio_relevant$Type <- "Both"
-bio_relevant$Type[!bio_relevant$AI] <- "Collections"
-bio_relevant$Type[!bio_relevant$Collections] <- "AI"
-bio_relevant$date_formatted <- as.Date(bio_relevant$date, format="%m/%d/%Y")
-bio_relevant <- bio_relevant[!is.na(bio_relevant$date_formatted),]
-bio_relevant$year <- as.numeric(format(bio_relevant$date_formatted, "%Y"))
-bio_aggregate <- bio_relevant |> group_by(year, Type) |> summarise(count=n(), funds=sum(as.numeric(fundsObligatedAmt)), .groups = "drop_last")
-g <- ggplot(bio_aggregate, aes(x=year, y=funds, fill=Type))  + xlim(2016,NA) + geom_area(position = "fill") + xlab("Year of grant") + ylab("Proportion of funds") + theme_minimal() + ggtitle("Biology grants: division of funding between AI and collections grants") + scale_fill_manual(values=c("firebrick1", "darkorchid", "dodgerblue"))
-print(g)
-#> Warning: Removed 55 rows containing non-finite outside the scale range
-#> (`stat_align()`).
-```
-
 <img src="man/figures/README-systematics_bio-1.png" alt="" width="100%" />
-
-``` r
-g <- ggplot(bio_aggregate, aes(x=year, y=funds, colour=Type))  + geom_line() + xlab("Year of grant") + ylab("Total funds") + theme_minimal() + ggtitle("Biology grants: division of funding between AI and collections grants") + scale_fill_manual(values=c("firebrick1", "darkorchid", "dodgerblue")) + scale_y_continuous(labels = unit_format(unit = "M", scale = 1e-6))
-print(g)
-```
 
 <img src="man/figures/README-systematics_bio_line-1.png" alt="" width="100%" />
 
@@ -196,53 +114,39 @@ We can also look at a table with the number, not total money, of grants
 by state or territory by academic semester, for example (only including
 this year up to the last cache of the data).
 
-``` r
-library(tidyr)
-library(knitr)
-
-data(grants)
-grants$awardeeStateCode <- toupper(grants$awardeeStateCode) # handle some early data that uses lowercase
-grants$academic_semester <- rnsf::date_to_academic_semester(as.Date(grants$date, format="%m/%d/%Y"))
-grants_aggregated <- grants |> filter(academic_semester %in% apply(expand.grid(c(2024:2026), c(" Fall", "  Spring")), 1, paste0, collapse="")) |> group_by(academic_semester, awardeeStateCode) |> summarise(total_awarded = n(), .groups = "drop_last") |> ungroup() |> tidyr::pivot_wider(names_from = academic_semester, values_from=total_awarded, values_fill=0) |> dplyr::arrange(desc(`2024 Fall`))
-colnames(grants_aggregated) <- gsub("  ", " ", colnames(grants_aggregated))
-colnames(grants_aggregated)[1] <- "Area"
-grants_aggregated[,1] <- rnsf::abbreviation_to_state(unname(unlist(grants_aggregated[,1])))
-knitr::kable(grants_aggregated)
-```
-
 | Area | 2024 Spring | 2024 Fall | 2025 Spring | 2025 Fall | 2026 Spring | 2026 Fall |
 |:---|---:|---:|---:|---:|---:|---:|
-| California | 508 | 752 | 361 | 586 | 274 | 446 |
-| New York | 371 | 475 | 256 | 371 | 166 | 281 |
-| Texas | 324 | 415 | 224 | 355 | 133 | 280 |
-| Massachusetts | 327 | 410 | 189 | 305 | 131 | 225 |
-| Pennsylvania | 243 | 282 | 165 | 233 | 117 | 189 |
-| Illinois | 218 | 277 | 122 | 224 | 85 | 126 |
-| Virginia | 161 | 227 | 89 | 139 | 66 | 141 |
-| Florida | 184 | 225 | 105 | 179 | 104 | 141 |
-| Michigan | 208 | 215 | 97 | 188 | 84 | 111 |
-| North Carolina | 153 | 210 | 103 | 181 | 70 | 132 |
-| Colorado | 111 | 183 | 73 | 146 | 46 | 103 |
+| California | 508 | 752 | 361 | 586 | 269 | 451 |
+| New York | 371 | 475 | 256 | 371 | 160 | 287 |
+| Texas | 324 | 415 | 224 | 355 | 140 | 273 |
+| Massachusetts | 327 | 410 | 189 | 305 | 127 | 229 |
+| Pennsylvania | 243 | 282 | 165 | 233 | 116 | 190 |
+| Illinois | 218 | 277 | 122 | 224 | 79 | 132 |
+| Virginia | 161 | 227 | 89 | 139 | 69 | 138 |
+| Florida | 184 | 225 | 105 | 179 | 101 | 144 |
+| Michigan | 208 | 215 | 97 | 188 | 77 | 118 |
+| North Carolina | 153 | 210 | 103 | 181 | 71 | 131 |
+| Colorado | 111 | 183 | 73 | 146 | 44 | 105 |
 | Arizona | 101 | 177 | 65 | 99 | 35 | 92 |
 | Georgia | 137 | 171 | 78 | 147 | 57 | 111 |
-| Indiana | 130 | 166 | 83 | 157 | 58 | 90 |
-| Maryland | 118 | 147 | 79 | 129 | 79 | 108 |
-| New Jersey | 123 | 146 | 90 | 138 | 64 | 99 |
-| Washington | 97 | 144 | 68 | 106 | 44 | 90 |
-| Ohio | 110 | 134 | 73 | 106 | 50 | 91 |
-| Tennessee | 78 | 108 | 41 | 83 | 34 | 52 |
+| Indiana | 130 | 166 | 83 | 157 | 59 | 89 |
+| Maryland | 118 | 147 | 79 | 129 | 81 | 106 |
+| New Jersey | 123 | 146 | 90 | 138 | 63 | 100 |
+| Washington | 97 | 144 | 68 | 106 | 43 | 91 |
+| Ohio | 110 | 134 | 73 | 106 | 49 | 92 |
+| Tennessee | 78 | 108 | 41 | 83 | 35 | 51 |
 | Alabama | 63 | 105 | 51 | 74 | 35 | 90 |
-| Wisconsin | 76 | 105 | 64 | 91 | 45 | 71 |
+| Wisconsin | 76 | 105 | 64 | 91 | 44 | 72 |
 | South Carolina | 60 | 102 | 31 | 66 | 31 | 73 |
 | District of Columbia | 51 | 101 | 42 | 55 | 32 | 58 |
 | Minnesota | 79 | 101 | 47 | 62 | 27 | 43 |
-| Rhode Island | 66 | 84 | 46 | 71 | 46 | 72 |
+| Rhode Island | 66 | 84 | 46 | 71 | 47 | 71 |
 | Oregon | 68 | 83 | 41 | 65 | 27 | 49 |
 | Iowa | 54 | 77 | 36 | 66 | 23 | 60 |
 | Louisiana | 54 | 77 | 30 | 68 | 33 | 68 |
-| Utah | 44 | 77 | 35 | 65 | 25 | 46 |
-| Missouri | 74 | 76 | 64 | 63 | 39 | 64 |
-| Connecticut | 66 | 63 | 52 | 66 | 32 | 57 |
+| Utah | 44 | 77 | 35 | 65 | 26 | 45 |
+| Missouri | 74 | 76 | 64 | 63 | 41 | 62 |
+| Connecticut | 66 | 63 | 52 | 66 | 31 | 58 |
 | New Mexico | 34 | 62 | 21 | 38 | 21 | 53 |
 | Oklahoma | 42 | 59 | 23 | 51 | 26 | 47 |
 | Kansas | 29 | 58 | 14 | 34 | 24 | 40 |
@@ -276,44 +180,6 @@ see how funding so far this year compares to average funding at this
 point of the year for 2017-2024 (so it encompasses two different
 administrations).
 
-``` r
-library(lubridate)
-#> 
-#> Attaching package: 'lubridate'
-#> The following objects are masked from 'package:base':
-#> 
-#>     date, intersect, setdiff, union
-library(ggrepel)
-
-data(grants)
-
-current_day_of_year <- lubridate::yday(Sys.Date())
-grants_modified <- grants
-grants_modified$awardeeStateCode <- toupper(grants_modified$awardeeStateCode) # handle some early data that uses lowercase
-grants_modified$date_formatted <- as.Date(grants_modified$date, format="%m/%d/%Y")
-grants_modified <- grants_modified[!is.na(grants_modified$date_formatted),]
-grants_modified$day_of_year <- lubridate::yday(grants_modified$date_formatted)
-grants_modified$year <- as.numeric(format(grants_modified$date_formatted, "%Y"))
-grants_modified$funds <- as.numeric(grants_modified$fundsObligatedAmt)
-grants_recent <- grants_modified |> group_by(awardeeStateCode) |> summarize(most_recent = max(date_formatted), days_since_grant = Sys.Date() - max(date_formatted))
-
-grants_2026 <- subset(grants_modified, year==2026)
-grants_2017_2024 <- subset(grants_modified, year>= 2017 & year <=2024) # so we have 8 years of data across two admins
-grants_2017_2024 <- subset(grants_2017_2024, day_of_year < current_day_of_year) # so we compare similar
-grants_aggregated_2026 <- grants_2026 |> group_by(awardeeStateCode) |> summarize(funds_per_year_2026 = sum(funds)) |> arrange(awardeeStateCode) |> ungroup()
-grants_aggregated_2017_2024 <- grants_2017_2024 |> group_by(awardeeStateCode) |> summarize(funds_per_year_8 = sum(funds)/8) |> arrange(awardeeStateCode) |> ungroup()
-grants_comparison <- full_join(full_join(grants_aggregated_2017_2024, grants_aggregated_2026), grants_recent)
-#> Joining with `by = join_by(awardeeStateCode)`
-#> Joining with `by = join_by(awardeeStateCode)`
-grants_comparison$funds_per_year_2026[is.na(grants_comparison$funds_per_year_2026)] <- 0
-grants_comparison <- subset(grants_comparison, !is.na(grants_comparison$funds_per_year_8)) # rarely get funding
-grants_comparison <- subset(grants_comparison, grants_comparison$funds_per_year_8>50000) # eliminate entities which have traditionally low, rare funding as they make it hard to see the wait times for the others 
-grants_comparison$percentage_usual_funding_by_this_date <- 100*grants_comparison$funds_per_year_2026 / grants_comparison$funds_per_year_8
-grants_comparison$days_since_grant <- as.numeric(grants_comparison$days_since_grant)
-g <- ggplot(grants_comparison, aes(x=days_since_grant, y=percentage_usual_funding_by_this_date, label=awardeeStateCode)) + geom_text_repel(max.overlaps=50, alpha=0.8) + theme_minimal() + xlab("Days since most recent grant") + ylab("2026 percentage of usual funding by this date") + geom_point(alpha=0.5) + scale_x_continuous(trans='log1p', breaks=c(1, 7, 30, 90, 120, 365, 2*365), limits=c(0, NA)) 
-print(g)
-```
-
 <img src="man/figures/README-recent-1.png" alt="" width="100%" />
 
 ## Rolling window
@@ -321,62 +187,17 @@ print(g)
 How is NSF awarding grants over time? This uses a two week rolling
 interval, showing the average grants awarded per day in that interval.
 
-``` r
-data(grants)
-grants_modified <- grants
-grants_modified$date_formatted <- as.Date(grants_modified$date, format="%m/%d/%Y")
-grants_modified <- grants_modified[!is.na(grants_modified$date_formatted),]
-grants_modified$year <- as.numeric(format(grants_modified$date_formatted, "%Y"))
-grants_modified <- grants_modified[order(grants_modified$date_formatted),]
-grants_modified$funding <- as.numeric(grants_modified$fundsObligatedAmt)
-
-
-min_date <- -14+as.Date("01/01/2020", format="%m/%d/%Y")
-rolling_counts <- data.frame(end_date = as.Date(min_date:Sys.Date()), count=NA, amount=NA)
-for (count_index in sequence(nrow(rolling_counts))) {
-    focal_end_date <- rolling_counts$end_date[count_index]
-    grants_focal <- subset(grants_modified, date_formatted>(focal_end_date-14) & date_formatted<=focal_end_date)
-    rolling_counts$count[count_index] <- nrow(grants_focal)
-    rolling_counts$amount[count_index] <- sum(grants_focal$funding, na.rm=TRUE)
-}
-
-rolling_counts$dayofyear <- timeDate::dayOfYear(timeDate::timeDate(rolling_counts$end_date))
-rolling_counts$year <- format(rolling_counts$end_date, "%Y")
-
-# create a color vector: shades of gray for all but the last two years, which are blue and red
-years <- sort(unique(rolling_counts$year))
-n_years <- length(years)
-if (n_years >= 2) {
-  n_gray <- max(0, n_years - 2)
-  gray_vals <- if (n_gray>0) gray.colors(n_gray, start=0.85, end=0.4) else character(0)
-  cols <- c(gray_vals, "blue", "red")
-} else {
-  cols <- if (n_years==1) "blue" else character(0)
-}
-names(cols) <- years
-
-g <- ggplot(rolling_counts, aes(x=dayofyear, y=count/14, colour=year)) + geom_line() + theme_minimal() + xlab("End of 2 week period") + ylab("Grants awarded per day, two week rolling average") + scale_colour_manual(values=cols) + scale_y_continuous(trans='log1p', breaks=c(0, 1, 5, 10, 20, 40, 80, 160)) + scale_x_date(date_breaks = "1 months", date_labels =  "%b") + geom_point(data=rolling_counts[nrow(rolling_counts),]) 
-print(g)
-#> Warning in scale_x_date(date_breaks = "1 months", date_labels = "%b"): A <numeric> value was passed to a Date scale.
-#> ℹ The value was converted to a <Date> object.
-#> A <numeric> value was passed to a Date scale.
-#> ℹ The value was converted to a <Date> object.
-```
-
 <img src="man/figures/README-rolling-1.png" alt="" width="100%" />
 
 And rolling window not on a log scale:
 
-``` r
-g <- ggplot(rolling_counts, aes(x=dayofyear, y=count/14, colour=year)) + geom_line() + theme_minimal() + xlab("End of 2 week period") + ylab("Grants awarded per day, two week rolling average") + scale_colour_manual(values=cols) + scale_x_date(date_breaks = "1 months", date_labels =  "%b") + geom_point(data=rolling_counts[nrow(rolling_counts),]) 
-print(g)
-#> Warning in scale_x_date(date_breaks = "1 months", date_labels = "%b"): A <numeric> value was passed to a Date scale.
-#> ℹ The value was converted to a <Date> object.
-#> A <numeric> value was passed to a Date scale.
-#> ℹ The value was converted to a <Date> object.
-```
-
 <img src="man/figures/README-rolling_no_log-1.png" alt="" width="100%" />
+
+## Wordclouds
+
+    #> [1] "Finished first batch"
+
+<img src="man/figures/README-wordcloud-1.png" alt="" width="100%" />
 
 ## GRFP data
 
@@ -391,33 +212,13 @@ receiving the money) and those with honorable mentions are released
 but you can only get one year at a time. I have manually downloaded them
 all and incorporated them into the package. To use:
 
-``` r
-library(rnsf)
-data(grfp)
-```
-
 You can then plot information or do other analyses. For example, the
 number of awards in Mathematical Sciences over time:
-
-``` r
-grfp_math <- grfp[grepl("Mathematical Sciences", grfp$Field.of.Study),] |> subset(award_level=="Awardee")
-grfp_math$year <- as.numeric(grfp_math$year)
-grfp_math_by_year <- grfp_math |> group_by(year) |> summarize(count=n()) |> ungroup()
-g <- ggplot(grfp_math_by_year, aes(x=year, y=count, group=1)) + geom_line() + theme_minimal() + xlab("GRFP Year") + ylab("Number of awards in 'Mathematical Sciences'")
-print(g)
-```
 
 <img src="man/figures/README-grfpplot-1.png" alt="" width="100%" />
 
 And the frequency of different subfields of math, showing just the first
 twenty from the past ten years of awards:
-
-``` r
-library(stringr)
-subfields <- stringr::str_to_title(gsub("Mathematical Sciences - ", "", grfp_math$Field.of.Study))
-popularity <- t(t(sort(table(subfields), decreasing=TRUE)))
-knitr::kable(head(popularity, 20))
-```
 
 |                                                          |     |
 |:---------------------------------------------------------|----:|
@@ -449,15 +250,7 @@ First, update the package version in the DESCRIPTION.
 Then the directory containing the package source:
 
     library(rnsf)
-    grants <- nsf_update_cached_this_year() # perhaps worth doing a new nsf_get_all() after the beginning of the year
-    usethis::use_data(grants, overwrite=TRUE) 
-    devtools::install()
-
-Then quit R and reopen (so it uses the latest saved grants).
-
-Then:
-
-    library(rnsf)
+    grants_this_year <- nsf_update_cached_this_year() # perhaps worth doing a new nsf_get_all() after the beginning of the year
     devtools::build_readme()
     pkgdown::build_site()
     system("git add */*")

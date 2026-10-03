@@ -1,17 +1,23 @@
 Package: rnsf
 Title: Interface to the NSF Grants API
-Version: 2026.09.24.01
+Version: 2026.10.03.01
 Authors@R: person("Brian", "O'Meara", email = "omeara.brian@gmail.com", role = c("aut", "cre"))
 Description: Uses the United States' National Science Foundation (NSF) API (https://www.research.gov/common/webapi/awardapisearch-v1.htm) to download info on awards (grants for funding science). Also includes functions for visualizing and analyzing the data.
 Depends: R (>= 3.5.0)
 License: GPL (>=2)
 Encoding: UTF-8
 LazyData: false
-RoxygenNote: 7.3.3
 Imports: jsonlite,
     plyr,
     wordcloud,
     tm,
     lubridate,
-	USAboundaries
-Suggests: testthat
+	USAboundaries,
+	piggyback
+Suggests: 
+    knitr,
+    quarto,
+    testthat
+VignetteBuilder:
+    quarto
+Config/roxygen2/version: 8.1.0

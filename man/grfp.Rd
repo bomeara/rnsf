@@ -8,7 +8,7 @@
 A data frame with one row per award and columns with award information
 }
 \usage{
-grfp
+data(grfp)
 }
 \description{
 A dataset of NSF GRFP awards and honorable mentions from its start until the package was last updated
