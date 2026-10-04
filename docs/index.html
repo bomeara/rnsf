@@ -89,7 +89,7 @@
 <li>Use <code><a href="reference/load_nsf_grants.html">rnsf::load_nsf_grants()</a></code> to load cached data (available <a href="https://github.com/bomeara/rnsf/releases/tag/most-recent" class="external-link">here</a>) for years you specify. By default, it loads cached data from the most recent year. Good if you want to do an analysis across thousands of grants.
 <ul>
 <li>If we wanted to look at grants from 2020 to the present, we can call <code>rnsf::load_nsf_grants(year_start=2020)</code> and it will download the cached grants.</li>
-<li>If we wanted to add any grants</li>
+<li>If we wanted to add any grants since I last updated the cache, we can call <code>rnsf::load_nsf_grants(year_start=2020, update_current_year=TRUE)</code>. This will re-download all grants from the current year.</li>
 </ul>
 </li>
 <li>Use <code>data(grfp)</code> after loading the package to load information on all the Graduate Research Fellowship Program awards and honorable mentions (these are not available from NSF’s API, so I had to download each year’s pair of spreadsheets).</li>
@@ -113,6 +113,7 @@
 </h2>
 <p>Let’s look just at awards made in any program with “bio” or “systematics” or “evolution” in the name (biology grants) and see how words have changed between those that mention collections-related work (voucher, collection, field work, fieldwork, specimen) or those that mention AI (AI, artificial intelligence, LLM, large language model) in the abstract. First as a proportion of all the grants of either kind:</p>
 <p><img src="reference/figures/README-systematics_bio-1.png" alt="" width="100%"></p>
+<p>And then the actual amount of funding awarded:</p>
 <p><img src="reference/figures/README-systematics_bio_line-1.png" alt="" width="100%"></p>
 </div>
 <div class="section level2">
@@ -199,7 +200,7 @@
 <div class="section level2">
 <h2 id="comparisons-by-state">Comparisons by state<a class="anchor" aria-label="anchor" href="#comparisons-by-state"></a>
 </h2>
-<p>We can see how number of awards and total value of awards by state or territory versus the average so far this year compares to average funding at this point of the year for 2017-2024 (so it encompasses two different administrations).</p>
+<p>We can see how number of awards and total value of awards by state or territory versus the average so far this year compares to average funding at this point of the year for 2017-2024 (so it encompasses two different administrations). Note that the color scale is symmetric – a reduction is orange, a gain is purple, and no change is white.</p>
 <p><img src="reference/figures/README-recent-1.png" alt="" width="100%"></p>
 <p><img src="reference/figures/README-statemoney-1.png" alt="" width="100%"></p>
 <p>Note that VT had an increase of 288% but was truncated at 179 so that no change would remain at the center of the plot colors.</p>
@@ -207,7 +208,7 @@
 <div class="section level2">
 <h2 id="rolling-window">Rolling window<a class="anchor" aria-label="anchor" href="#rolling-window"></a>
 </h2>
-<p>How is NSF awarding grants over time? This uses a two week rolling interval, showing the average grants awarded per day in that interval.</p>
+<p>How is NSF awarding grants over time? This uses a two week rolling interval, showing the average grants awarded per day in that interval. This can pick up things like temporary stoppages of awards.</p>
 <p><img src="reference/figures/README-rolling-1.png" alt="" width="100%"></p>
 <p>And rolling window not on a log scale:</p>
 <p><img src="reference/figures/README-rolling_no_log-1.png" alt="" width="100%"></p>
@@ -215,6 +216,7 @@
 <div class="section level2">
 <h2 id="wordclouds">Wordclouds<a class="anchor" aria-label="anchor" href="#wordclouds"></a>
 </h2>
+<p>This pulls in all grants mentioning the clade of ants (<code>ants &lt;- rnsf::nsf_return(keyword="Formicidae"</code>) and then uses the <code><a href="reference/nsf_wordcloud.html">rnsf::nsf_wordcloud()</a></code> function to list the words by frequency.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co">#&gt; [1] "Finished first batch"</span></span></code></pre></div>
 <p><img src="reference/figures/README-wordcloud-1.png" alt="" width="100%"></p>
 </div>

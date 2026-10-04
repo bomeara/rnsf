@@ -45,7 +45,10 @@ There are three main ways to get data:
   - If we wanted to look at grants from 2020 to the present, we can call
     `rnsf::load_nsf_grants(year_start=2020)` and it will download the
     cached grants.
-  - If we wanted to add any grants
+  - If we wanted to add any grants since I last updated the cache, we
+    can call
+    `rnsf::load_nsf_grants(year_start=2020, update_current_year=TRUE)`.
+    This will re-download all grants from the current year.
 - Use `data(grfp)` after loading the package to load information on all
   the Graduate Research Fellowship Program awards and honorable mentions
   (these are not available from NSF’s API, so I had to download each
@@ -103,6 +106,8 @@ the abstract. First as a proportion of all the grants of either kind:
 
 <img src="man/figures/README-systematics_bio-1.png" alt="" width="100%" />
 
+And then the actual amount of funding awarded:
+
 <img src="man/figures/README-systematics_bio_line-1.png" alt="" width="100%" />
 
 ## Table of award info
@@ -126,7 +131,8 @@ states by grants).
 We can see how number of awards and total value of awards by state or
 territory versus the average so far this year compares to average
 funding at this point of the year for 2017-2024 (so it encompasses two
-different administrations).
+different administrations). Note that the color scale is symmetric – a
+reduction is orange, a gain is purple, and no change is white.
 
 <img src="man/figures/README-recent-1.png" alt="" width="100%" />
 
@@ -139,6 +145,7 @@ change would remain at the center of the plot colors.
 
 How is NSF awarding grants over time? This uses a two week rolling
 interval, showing the average grants awarded per day in that interval.
+This can pick up things like temporary stoppages of awards.
 
 <img src="man/figures/README-rolling-1.png" alt="" width="100%" />
 
@@ -147,6 +154,10 @@ And rolling window not on a log scale:
 <img src="man/figures/README-rolling_no_log-1.png" alt="" width="100%" />
 
 ## Wordclouds
+
+This pulls in all grants mentioning the clade of ants
+(`ants <- rnsf::nsf_return(keyword="Formicidae"`) and then uses the
+`rnsf::nsf_wordcloud()` function to list the words by frequency.
 
     #> [1] "Finished first batch"
 

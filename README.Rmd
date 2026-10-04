@@ -53,7 +53,7 @@ There are three main ways to get data:
     * For example, if we're curious about grants relevant to Yellowstone National Park, we could call `rnsf:nsf_return(keyword="Yellowstone")`. It will call the API multiple times until it has downloaded info on all grants with that keyword and returned a data.frame object.
 * Use `rnsf::load_nsf_grants()` to load cached data (available [here](https://github.com/bomeara/rnsf/releases/tag/most-recent)) for years you specify. By default, it loads cached data from the most recent year. Good if you want to do an analysis across thousands of grants.
     * If we wanted to look at grants from 2020 to the present, we can call `rnsf::load_nsf_grants(year_start=2020)` and it will download the cached grants.
-	* If we wanted to add any grants 
+	* If we wanted to add any grants since I last updated the cache, we can call `rnsf::load_nsf_grants(year_start=2020, update_current_year=TRUE)`. This will re-download all grants from the current year.
 * Use `data(grfp)` after loading the package to load information on all the Graduate Research Fellowship Program awards and honorable mentions (these are not available from NSF's API, so I had to download each year's pair of spreadsheets).
 
 Below are some examples of the package's utility; see <https://github.com/bomeara/rnsf/blob/master/README.Rmd> for the details of the code to make the plots.
@@ -154,6 +154,7 @@ g <- ggplot(bio_aggregate, aes(x=year, y=funds, fill=Type))  + xlim(2016,NA) + g
 print(g)
 ```
 
+And then the actual amount of funding awarded:
 
 ```{r systematics_bio_line}
 g <- ggplot(bio_aggregate, aes(x=year, y=funds, colour=Type))  + geom_line() + xlab("Year of grant") + ylab("Total funds") + theme_minimal() + ggtitle("Biology grants: division of funding between AI and collections grants") + scale_fill_manual(values=c("firebrick1", "darkorchid", "dodgerblue")) + scale_y_continuous(labels = unit_format(unit = "M", scale = 1e-6))
@@ -182,7 +183,7 @@ knitr::kable(head(grants_aggregated), row.names=FALSE)
 
 ## Comparisons by state
 
-We can see how number of awards and total value of awards by state or territory versus the average so far this year compares to average funding at this point of the year for 2017-2024 (so it encompasses two different administrations).
+We can see how number of awards and total value of awards by state or territory versus the average so far this year compares to average funding at this point of the year for 2017-2024 (so it encompasses two different administrations). Note that the color scale is symmetric -- a reduction is orange, a gain is purple, and no change is white.
 
 ```{r recent}
 #| code-fold: true
@@ -227,7 +228,7 @@ grants_comparison$state_abbrev <- grants_comparison$awardeeStateCode
 
 mp <- PresElectionResults::xsf_TileOutv10 |>
   left_join(PresElectionResults::pres_by_state) |>
-              filter(year == 2024)    |> left_join(grants_comparison)
+              filter(year == 2024) |> left_join(grants_comparison)  |> mutate(margins = republican - democrat)
 
 min_award <- min(mp$percentage_usual_award_count_by_this_date)
 
@@ -298,7 +299,7 @@ print(g)
 
 ## Rolling window
 
-How is NSF awarding grants over time? This uses a two week rolling interval, showing the average grants awarded per day in that interval.
+How is NSF awarding grants over time? This uses a two week rolling interval, showing the average grants awarded per day in that interval. This can pick up things like temporary stoppages of awards.
 
 ```{r rolling}
 #| code-fold: true
@@ -350,6 +351,8 @@ print(g)
 ```
 
 ## Wordclouds
+
+This pulls in all grants mentioning the clade of ants (`ants <- rnsf::nsf_return(keyword="Formicidae"`) and then uses the `rnsf::nsf_wordcloud()` function to list the words by frequency.
 
 ```{r wordcloud}
 ants <- rnsf::nsf_return(keyword="Formicidae")
