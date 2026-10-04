@@ -381,7 +381,7 @@ nsf_update_this_year <- function(grants) {
 		save_file = NULL,
 		startdate = paste0("01/01/", current_year)
 	)
-	grants_this_year$date <- grants_this_year$date_formatted <- as.Date(
+	grants_this_year$date_formatted <- as.Date(
 		grants_this_year$date,
 		format = "%m/%d/%Y"
 	)
@@ -389,7 +389,13 @@ nsf_update_this_year <- function(grants) {
 		grants_this_year$date_formatted,
 		"%Y"
 	))
-	grants <- dplyr::bind_rows(grants_through_last_year, grants_this_year)
+	grants <- grants_this_year
+	if (nrow(grants_through_last_year) > 0) {
+		grants <- dplyr::bind_rows(
+			grants_through_last_year,
+			grants_this_year
+		)
+	}
 	print(paste0(
 		"originally had ",
 		nrow(grants_cached_this_year),

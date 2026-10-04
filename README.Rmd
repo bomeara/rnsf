@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
   comment = "#>",
   fig.path = "man/figures/README-",
   out.width = "100%",
-  fig.height = 7,
+  fig.height = 4,
   fig.width = 7,
   fig.dpi = 600
 )
@@ -62,7 +62,7 @@ Below are some examples of the package's utility; see <https://github.com/bomear
 
 Scientist Jeremy Berg often graphs federal funding over time (see <https://jeremymberg.github.io/jeremyberg.github.io/>). The very useful website [Grant Witness](https://grantwitness.org) has adopted these graphs, including invaluable updates of national funding and breakdowns by NSF division (see, for example, [here](https://grantwitness.org/nsf/analyses/agency-pulse-nsf-grants)). With the `rnsf` package we can look at finer detail. For example, the US Census splits the 50 US states into four different regions: Northeast, Midwest, South, and West. We can look at funding over time by region instead of nationally:
 
-```{r bergogram, warning=FALSE, echo=FALSE}
+```{r bergogram, warning=FALSE, echo=FALSE, fig.width=8, fig.height=3}
 library(tidyverse)
 recent_grants <- rnsf::load_nsf_grants(year_start=2019)
 recent_grants <- dplyr::left_join(recent_grants, data.frame(perfStateCode=state.abb, Region=state.region), by='perfStateCode')
@@ -87,7 +87,7 @@ names(cols) <- years
 
 organized_grants <- recent_grants |> arrange(year, dayofyear) |> filter(!is.na(Region)) |> group_by(year, Region) |> mutate(estimatedTotalAmt_by_year = cumsum(estimatedTotalAmt), total_grants = cumsum(count)) |> ungroup()
 
-g <- ggplot(organized_grants, aes(x=dayofyear, y=total_grants, colour=year)) + geom_line() + theme_minimal() + xlab("Day") + ylab("Number of grants awarded") + scale_x_date(date_breaks = "2 months", date_labels =  "%b") + facet_wrap(~Region,  scales="free_y") + scale_colour_manual(values=cols)
+g <- ggplot(organized_grants, aes(x=dayofyear, y=total_grants, colour=year)) + geom_line() + theme_minimal() + xlab("Day") + ylab("Number of grants awarded") + scale_x_date(date_breaks = "4 months", date_labels =  "%b") + facet_wrap(~Region,  scales="free_y", nrow=1) + scale_colour_manual(values=cols)
 
 print(g)
 
@@ -162,7 +162,7 @@ print(g)
 
 ## Table of award info
 
-We can also look at a table with the number, not total money, of grants by state or territory by academic semester, for example (only including this year up to the last cache of the data).
+We can also look at a table with the number, not total money, of grants by state or territory by academic semester, for example (only including this year up to the last cache of the data, and just showing the top few states by grants).
 
 ```{r grantsbyyear}
 #| code-fold: true
@@ -177,7 +177,7 @@ grants_aggregated <- grants |> filter(academic_semester %in% apply(expand.grid(c
 colnames(grants_aggregated) <- gsub("  ", " ", colnames(grants_aggregated))
 colnames(grants_aggregated)[1] <- "Area"
 grants_aggregated[,1] <- rnsf::abbreviation_to_state(unname(unlist(grants_aggregated[,1])))
-knitr::kable(grants_aggregated)
+knitr::kable(head(grants_aggregated), row.names=FALSE)
 ```
 
 ## Comparisons by state

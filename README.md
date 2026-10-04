@@ -109,7 +109,8 @@ the abstract. First as a proportion of all the grants of either kind:
 
 We can also look at a table with the number, not total money, of grants
 by state or territory by academic semester, for example (only including
-this year up to the last cache of the data).
+this year up to the last cache of the data, and just showing the top few
+states by grants).
 
 | Area | 2024 Spring | 2024 Fall | 2025 Spring | 2025 Fall | 2026 Spring | 2026 Fall |
 |:---|---:|---:|---:|---:|---:|---:|
@@ -119,55 +120,6 @@ this year up to the last cache of the data).
 | Massachusetts | 327 | 410 | 189 | 305 | 127 | 229 |
 | Pennsylvania | 243 | 282 | 165 | 233 | 116 | 190 |
 | Illinois | 218 | 277 | 122 | 224 | 79 | 132 |
-| Virginia | 161 | 227 | 89 | 139 | 69 | 138 |
-| Florida | 184 | 225 | 105 | 179 | 101 | 144 |
-| Michigan | 208 | 215 | 97 | 188 | 77 | 118 |
-| North Carolina | 153 | 210 | 103 | 181 | 71 | 131 |
-| Colorado | 111 | 183 | 73 | 146 | 44 | 105 |
-| Arizona | 101 | 177 | 65 | 99 | 35 | 92 |
-| Georgia | 137 | 171 | 78 | 147 | 57 | 111 |
-| Indiana | 130 | 166 | 83 | 157 | 59 | 89 |
-| Maryland | 118 | 147 | 79 | 129 | 81 | 106 |
-| New Jersey | 123 | 146 | 90 | 138 | 63 | 100 |
-| Washington | 97 | 144 | 68 | 106 | 43 | 91 |
-| Ohio | 110 | 134 | 73 | 106 | 49 | 92 |
-| Tennessee | 78 | 108 | 41 | 83 | 35 | 51 |
-| Alabama | 63 | 105 | 51 | 74 | 35 | 90 |
-| Wisconsin | 76 | 105 | 64 | 91 | 44 | 72 |
-| South Carolina | 60 | 102 | 31 | 66 | 31 | 73 |
-| District of Columbia | 51 | 101 | 42 | 55 | 32 | 58 |
-| Minnesota | 79 | 101 | 47 | 62 | 27 | 43 |
-| Rhode Island | 66 | 84 | 46 | 71 | 47 | 71 |
-| Oregon | 68 | 83 | 41 | 65 | 27 | 49 |
-| Iowa | 54 | 77 | 36 | 66 | 23 | 60 |
-| Louisiana | 54 | 77 | 30 | 68 | 33 | 68 |
-| Utah | 44 | 77 | 35 | 65 | 26 | 45 |
-| Missouri | 74 | 76 | 64 | 63 | 41 | 62 |
-| Connecticut | 66 | 63 | 52 | 66 | 31 | 58 |
-| New Mexico | 34 | 62 | 21 | 38 | 21 | 53 |
-| Oklahoma | 42 | 59 | 23 | 51 | 26 | 47 |
-| Kansas | 29 | 58 | 14 | 34 | 24 | 40 |
-| Nebraska | 39 | 55 | 22 | 44 | 14 | 34 |
-| Hawaii | 15 | 53 | 16 | 28 | 15 | 32 |
-| Kentucky | 36 | 51 | 28 | 40 | 16 | 44 |
-| Delaware | 18 | 47 | 31 | 37 | 19 | 37 |
-| Idaho | 16 | 43 | 16 | 31 | 14 | 24 |
-| Nevada | 12 | 43 | 11 | 31 | 10 | 32 |
-| New Hampshire | 21 | 36 | 21 | 35 | 11 | 27 |
-| Mississippi | 38 | 35 | 19 | 35 | 10 | 20 |
-| Alaska | 10 | 32 | 4 | 19 | 5 | 26 |
-| Montana | 19 | 32 | 8 | 22 | 8 | 27 |
-| Maine | 30 | 27 | 10 | 24 | 5 | 16 |
-| Arkansas | 27 | 25 | 10 | 26 | 13 | 14 |
-| West Virginia | 28 | 25 | 8 | 26 | 5 | 17 |
-| South Dakota | 20 | 22 | 17 | 17 | 4 | 19 |
-| Vermont | 13 | 22 | 12 | 13 | 6 | 17 |
-| Puerto Rico | 7 | 20 | 9 | 14 | 3 | 13 |
-| Wyoming | 10 | 19 | 7 | 18 | 5 | 7 |
-| North Dakota | 11 | 12 | 9 | 21 | 9 | 15 |
-| Virgin Islands of the U.S. | 0 | 3 | 1 | 1 | 0 | 1 |
-| American Samoa | 0 | 1 | 0 | 0 | 0 | 0 |
-| Guam | 0 | 0 | 2 | 1 | 0 | 0 |
 
 ## Comparisons by state
 
