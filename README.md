@@ -75,8 +75,6 @@ Grant Witness: they typically plot by financial year, not calendar year;
 they also filter out transfer grants (a grant moves between PIs or
 institutions) and the code above does not do that.
 
-<details>
-
 ## Topic frequency over time
 
 The ozone hole was discovered in
@@ -93,7 +91,6 @@ regression before and after 1985 and show the 95% CI for the proportion
 in each year (truncated by the y-axis limits).
 
 <img src="man/figures/README-ozone-1.png" alt="" width="100%" />
-</details>
 
 ## Keywords
 
@@ -172,15 +169,19 @@ this year up to the last cache of the data).
 | American Samoa | 0 | 1 | 0 | 0 | 0 | 0 |
 | Guam | 0 | 0 | 2 | 1 | 0 | 0 |
 
-## Recent info
+## Comparisons by state
 
-We can see when the most recent grant has been awarded (relative to when
-this package was last built) by state or territory; we can also look to
-see how funding so far this year compares to average funding at this
-point of the year for 2017-2024 (so it encompasses two different
-administrations).
+We can see how number of awards and total value of awards by state or
+territory versus the average so far this year compares to average
+funding at this point of the year for 2017-2024 (so it encompasses two
+different administrations).
 
 <img src="man/figures/README-recent-1.png" alt="" width="100%" />
+
+<img src="man/figures/README-statemoney-1.png" alt="" width="100%" />
+
+Note that VT had an increase of 288% but was truncated at 179 so that no
+change would remain at the center of the plot colors.
 
 ## Rolling window
 

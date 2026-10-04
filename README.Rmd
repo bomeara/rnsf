@@ -87,15 +87,13 @@ names(cols) <- years
 
 organized_grants <- recent_grants |> arrange(year, dayofyear) |> filter(!is.na(Region)) |> group_by(year, Region) |> mutate(estimatedTotalAmt_by_year = cumsum(estimatedTotalAmt), total_grants = cumsum(count)) |> ungroup()
 
-g <- ggplot(organized_grants, aes(x=dayofyear, y=total_grants, colour=year)) + geom_line() + theme_minimal() + xlab("Day") + ylab("Number of grants awarded") + scale_x_date(date_breaks = "2 months", date_labels =  "%b") + facet_wrap(~Region) + scale_colour_manual(values=cols)
+g <- ggplot(organized_grants, aes(x=dayofyear, y=total_grants, colour=year)) + geom_line() + theme_minimal() + xlab("Day") + ylab("Number of grants awarded") + scale_x_date(date_breaks = "2 months", date_labels =  "%b") + facet_wrap(~Region,  scales="free_y") + scale_colour_manual(values=cols)
 
 print(g)
 
 ```
 
-Note some important differences between the plots above and those from Grant Witness: they typically plot by financial year, not calendar year; they also filter out transfer grants (a grant moves between PIs or institutions) and the code above does not do that. 
-
-<details>
+Note some important differences between the plots above and those from Grant Witness: they typically plot by financial year, not calendar year; they also filter out transfer grants (a grant moves between PIs or institutions) and the code above does not do that.
 
 ## Topic frequency over time
 
@@ -125,7 +123,6 @@ grants_by_year$ozone_upper_percent_truncated <- sapply(grants_by_year$ozone_uppe
 g <- ggplot(grants_by_year, aes(x=year, y=ozone_percent, group=1))+ geom_errorbar(aes(ymin=ozone_lower_percent, ymax=ozone_upper_percent_truncated), colour="gray", alpha=0.4, width=0) + geom_point() + theme_minimal() + xlab("Year") + ylab("Percentage of grants mentioning 'ozone hole'") + geom_smooth(data=subset(grants_by_year, year<1985), se=FALSE, method="lm") + geom_smooth(data=subset(grants_by_year, year>=1985), se=FALSE, method="lm")  + ylim(c(0, 2*max(grants_by_year$ozone_percent)))
 print(g)
 ```
-</details>
 
 ## Keywords
 
@@ -183,15 +180,18 @@ grants_aggregated[,1] <- rnsf::abbreviation_to_state(unname(unlist(grants_aggreg
 knitr::kable(grants_aggregated)
 ```
 
-## Recent info
+## Comparisons by state
 
-We can see when the most recent grant has been awarded (relative to when this package was last built) by state or territory; we can also look to see how funding so far this year compares to average funding at this point of the year for 2017-2024 (so it encompasses two different administrations).
+We can see how number of awards and total value of awards by state or territory versus the average so far this year compares to average funding at this point of the year for 2017-2024 (so it encompasses two different administrations).
 
 ```{r recent}
 #| code-fold: true
 
 library(lubridate)
 library(ggrepel)
+library(tidyverse)
+library(PresElectionResults)
+library(sf)
 
 grants <- rnsf::load_nsf_grants(year_start=2017, update_current_year=FALSE)
 
@@ -203,22 +203,98 @@ grants_modified <- grants_modified[!is.na(grants_modified$date_formatted),]
 grants_modified$day_of_year <- lubridate::yday(grants_modified$date_formatted)
 grants_modified$year <- as.numeric(format(grants_modified$date_formatted, "%Y"))
 grants_modified$funds <- as.numeric(grants_modified$fundsObligatedAmt)
+grants_modified$counts <- 1
 grants_recent <- grants_modified |> group_by(awardeeStateCode) |> summarize(most_recent = max(date_formatted), days_since_grant = Sys.Date() - max(date_formatted))
 
 grants_2026 <- subset(grants_modified, year==2026)
 grants_2017_2024 <- subset(grants_modified, year>= 2017 & year <=2024) # so we have 8 years of data across two admins
 grants_2017_2024 <- subset(grants_2017_2024, day_of_year < current_day_of_year) # so we compare similar
-grants_aggregated_2026 <- grants_2026 |> group_by(awardeeStateCode) |> summarize(funds_per_year_2026 = sum(funds)) |> arrange(awardeeStateCode) |> ungroup()
-grants_aggregated_2017_2024 <- grants_2017_2024 |> group_by(awardeeStateCode) |> summarize(funds_per_year_8 = sum(funds)/8) |> arrange(awardeeStateCode) |> ungroup()
+grants_aggregated_2026 <- grants_2026 |> group_by(awardeeStateCode) |> summarize(funds_per_year_2026 = sum(funds), counts_per_year_2026 = sum(counts)) |> arrange(awardeeStateCode) |> ungroup()
+grants_aggregated_2017_2024 <- grants_2017_2024 |> group_by(awardeeStateCode) |> summarize(funds_per_year_8 = sum(funds, na.rm=TRUE)/8, counts_per_year_8 = sum(counts, na.rm=TRUE)/8) |> arrange(awardeeStateCode) |> ungroup()
 grants_comparison <- full_join(full_join(grants_aggregated_2017_2024, grants_aggregated_2026), grants_recent)
 grants_comparison$funds_per_year_2026[is.na(grants_comparison$funds_per_year_2026)] <- 0
 grants_comparison <- subset(grants_comparison, !is.na(grants_comparison$funds_per_year_8)) # rarely get funding
 grants_comparison <- subset(grants_comparison, grants_comparison$funds_per_year_8>50000) # eliminate entities which have traditionally low, rare funding as they make it hard to see the wait times for the others 
 grants_comparison$percentage_usual_funding_by_this_date <- 100*grants_comparison$funds_per_year_2026 / grants_comparison$funds_per_year_8
-grants_comparison$days_since_grant <- as.numeric(grants_comparison$days_since_grant)
-g <- ggplot(grants_comparison, aes(x=days_since_grant, y=percentage_usual_funding_by_this_date, label=awardeeStateCode)) + geom_text_repel(max.overlaps=50, alpha=0.8) + theme_minimal() + xlab("Days since most recent grant") + ylab("2026 percentage of usual funding by this date") + geom_point(alpha=0.5) + scale_x_continuous(trans='log1p', breaks=c(1, 7, 30, 90, 120, 365, 2*365), limits=c(0, NA)) 
+grants_comparison$percentage_usual_award_count_by_this_date <- 100*grants_comparison$counts_per_year_2026 / grants_comparison$counts_per_year_8
+
+
+# devtools::install_github("jaytimm/PresElectionResults") # mostly for the state boundaries, though perhaps useful for other analyses
+# Using example from https://github.com/jaytimm/American-political-data-and-R
+
+grants_comparison$state_abbrev <- grants_comparison$awardeeStateCode 
+
+
+mp <- PresElectionResults::xsf_TileOutv10 |>
+  left_join(PresElectionResults::pres_by_state) |>
+              filter(year == 2024)    |> left_join(grants_comparison)
+
+min_award <- min(mp$percentage_usual_award_count_by_this_date)
+
+mp$`% of normal award count` <- mp$percentage_usual_award_count_by_this_date
+
+
+g <- ggplot(mp) +  
+  geom_sf(aes(fill = `% of normal award count`),
+           color = 'darkgray', lwd = .15) +
+  geom_sf(data = PresElectionResults::xsf_TileInv10, 
+          fill = NA, 
+          show.legend = F, 
+          color = NA, 
+          lwd=.5) +
+		
+
+  geom_sf_text(data = PresElectionResults::xsf_TileInv10,
+                          aes(label = state_abbrev),
+                          size = 1.5,
+                          color='black') +
+  scale_fill_distiller(palette = "PuOr",  
+                        limit = c(min_award, 200-min_award), direction=1) +
+  theme_void() +   theme(legend.position="bottom") + ggtitle("Percent of usual NSF award count")
+  
+  
+
+# grants_comparison$days_since_grant <- as.numeric(grants_comparison$days_since_grant)
+# g <- ggplot(grants_comparison, aes(x=days_since_grant, y=percentage_usual_funding_by_this_date, label=awardeeStateCode)) + geom_text_repel(max.overlaps=50, alpha=0.8) + theme_minimal() + xlab("Days since most recent grant") + ylab("2026 percentage of usual funding by this date") + geom_point(alpha=0.5) + scale_x_continuous(trans='log1p', breaks=c(1, 7, 30, 90, 120, 365, 2*365), limits=c(0, NA)) 
 print(g)
 ```
+
+```{r statemoney}
+
+min_award <- min(mp$percentage_usual_funding_by_this_date)
+scale_limits <- c(min_award, 200-min_award)
+
+mp$`% of normal funding` <- mp$percentage_usual_funding_by_this_date
+
+big_jump <- mp[(mp$`% of normal funding`>max(scale_limits)),]
+
+mp$`% of normal funding`[mp$`% of normal funding`>max(scale_limits)] <- max(scale_limits)
+
+
+g <- ggplot(mp) +  
+  geom_sf(aes(fill = `% of normal funding`),
+           color = 'darkgray', lwd = .15) +
+  geom_sf(data = PresElectionResults::xsf_TileInv10, 
+          fill = NA, 
+          show.legend = F, 
+          color = NA, 
+          lwd=.5) +
+		
+
+  geom_sf_text(data = PresElectionResults::xsf_TileInv10,
+                          aes(label = state_abbrev),
+                          size = 1.5,
+                          color='black') +
+  scale_fill_distiller(palette = "PuOr",  
+                        limit = scale_limits, direction=1) +
+  theme_void() +   theme(legend.position="bottom") + ggtitle("Percent of usual NSF funding awarded per year")
+  
+  
+
+print(g)
+```
+
+`r ifelse(nrow(big_jump)>0, paste0("Note that ", paste(big_jump$state_abbrev, collapse=", "), " had an increase of ", paste(round(big_jump$percentage_usual_funding_by_this_date), collapse=", "), "% but was truncated at ", round(max(scale_limits)), " so that no change would remain at the center of the plot colors."), "")`
 
 ## Rolling window
 

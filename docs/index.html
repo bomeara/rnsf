@@ -101,13 +101,12 @@
 <p>Scientist Jeremy Berg often graphs federal funding over time (see <a href="https://jeremymberg.github.io/jeremyberg.github.io/" class="external-link uri">https://jeremymberg.github.io/jeremyberg.github.io/</a>). The very useful website <a href="https://grantwitness.org" class="external-link">Grant Witness</a> has adopted these graphs, including invaluable updates of national funding and breakdowns by NSF division (see, for example, <a href="https://grantwitness.org/nsf/analyses/agency-pulse-nsf-grants" class="external-link">here</a>). With the <code>rnsf</code> package we can look at finer detail. For example, the US Census splits the 50 US states into four different regions: Northeast, Midwest, South, and West. We can look at funding over time by region instead of nationally:</p>
 <p><img src="reference/figures/README-bergogram-1.png" alt="" width="100%"></p>
 <p>Note some important differences between the plots above and those from Grant Witness: they typically plot by financial year, not calendar year; they also filter out transfer grants (a grant moves between PIs or institutions) and the code above does not do that.</p>
-<details></details>
 </div>
 <div class="section level2">
 <h2 id="topic-frequency-over-time">Topic frequency over time<a class="anchor" aria-label="anchor" href="#topic-frequency-over-time"></a>
 </h2>
 <p>The ozone hole was discovered in <a href="https://www.usatoday.com/story/news/nation/2025/05/19/what-happened-to-the-hole-in-the-ozone-layer/83644470007/" class="external-link">1985</a>: pollution led to a depletion of the ozone layer, which shields people (and other organisms) from a great deal of UV radiation. The world came together and passed the Montreal Protocol to limit the pollution, chlorofluorocarbons, that was causing the damage. The hole is healing, but still requires research and monitoring. We can see how NSF grants mentioning “ozone hole” changed over time (though not all grants mentioning “ozone hole” study this issue; some could be using it as a comparison to some other issue, for example). We can include a regression before and after 1985 and show the 95% CI for the proportion in each year (truncated by the y-axis limits).</p>
-<img src="reference/figures/README-ozone-1.png" alt="" width="100%">
+<p><img src="reference/figures/README-ozone-1.png" alt="" width="100%"></p>
 </div>
 <div class="section level2">
 <h2 id="keywords">Keywords<a class="anchor" aria-label="anchor" href="#keywords"></a>
@@ -639,10 +638,12 @@
 </table>
 </div>
 <div class="section level2">
-<h2 id="recent-info">Recent info<a class="anchor" aria-label="anchor" href="#recent-info"></a>
+<h2 id="comparisons-by-state">Comparisons by state<a class="anchor" aria-label="anchor" href="#comparisons-by-state"></a>
 </h2>
-<p>We can see when the most recent grant has been awarded (relative to when this package was last built) by state or territory; we can also look to see how funding so far this year compares to average funding at this point of the year for 2017-2024 (so it encompasses two different administrations).</p>
+<p>We can see how number of awards and total value of awards by state or territory versus the average so far this year compares to average funding at this point of the year for 2017-2024 (so it encompasses two different administrations).</p>
 <p><img src="reference/figures/README-recent-1.png" alt="" width="100%"></p>
+<p><img src="reference/figures/README-statemoney-1.png" alt="" width="100%"></p>
+<p>Note that VT had an increase of 288% but was truncated at 179 so that no change would remain at the center of the plot colors.</p>
 </div>
 <div class="section level2">
 <h2 id="rolling-window">Rolling window<a class="anchor" aria-label="anchor" href="#rolling-window"></a>
