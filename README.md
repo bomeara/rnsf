@@ -6,7 +6,7 @@
 Unofficial package to interface with NSF API
 
 It also has abstracts, dates, and more information for all grants up to
-2026-09-23.
+2026-10-09.
 
 - Webpage with package information: <https://bomeara.github.io/rnsf/>
 - Github page: <https://github.com/bomeara/rnsf/>
@@ -119,12 +119,12 @@ states by grants).
 
 | Area | 2024 Spring | 2024 Fall | 2025 Spring | 2025 Fall | 2026 Spring | 2026 Fall |
 |:---|---:|---:|---:|---:|---:|---:|
-| California | 508 | 752 | 361 | 586 | 269 | 451 |
-| New York | 371 | 475 | 256 | 371 | 160 | 287 |
-| Texas | 324 | 415 | 224 | 355 | 140 | 273 |
-| Massachusetts | 327 | 410 | 189 | 305 | 127 | 229 |
-| Pennsylvania | 243 | 282 | 165 | 233 | 116 | 190 |
-| Illinois | 218 | 277 | 122 | 224 | 79 | 132 |
+| California | 508 | 752 | 361 | 586 | 268 | 453 |
+| New York | 371 | 475 | 256 | 371 | 157 | 290 |
+| Texas | 324 | 415 | 224 | 355 | 137 | 277 |
+| Massachusetts | 327 | 410 | 189 | 305 | 123 | 233 |
+| Pennsylvania | 243 | 282 | 165 | 233 | 115 | 191 |
+| Illinois | 218 | 277 | 122 | 224 | 84 | 127 |
 
 ## Comparisons by state
 
